@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var ActiveDirectory = require('ad');
+const { check, validationResult } = require('express-validator/check');
 var config = {
-  url: 'ldap://10.0.2.15/',
-  user: 'Administrator@mhs.local',
-  pass: 'Mirage@1007'
+  url: 'ldap://localhost/',
+  user: 'user@domain',
+  pass: '****'
 }
 var ad = new ActiveDirectory(config);
 
@@ -15,13 +16,33 @@ router.get('/', function (req, res, next) {
 
 /* POST login credentials. */
 router.post('/login', function (req, res, next) {
-  console.log(req.body.username);
-  console.log(req.body.password);
-  ad.user().get().then(users => {
-    console.log('Your users:', users);
+  var username = req.body.username;
+  var password = req.body.password;
+  check('username').notEmpty();
+  check('password').isLength({ min: 6 });
+  var errors = validationResult(req);
+  if(errors){
+    console.log("Errors");
+  } else {
+    console.log("No Errors");
+  }
+  ad.user(req.body.username).authenticate(req.body.password).then(result => {
+    if(result) {
+      console.log('Authentication:', result);
+      ad.user(req.body.username).get().then(user => {
+        console.log('User: ', user.displayName);
+        res.render('webstore', {page: 'MyDesktop', menuId: 'webstore', displayName: user.displayName});
+      });
+      
+    } else{
+      console.log('Invalid username or password !');
+      res.send('Invalid username or password !');
+    }
+    
   }).catch(err => {
-    console.log('Error getting users:', err);
+    console.log('Authentication failed:', err);
+    next(err);
   });
-  res.send("OK");
+  
 });
 module.exports = router;
