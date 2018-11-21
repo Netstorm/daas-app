@@ -1,4 +1,10 @@
 <!-- LOGIN FORM -->
+<% if (errors) { %>
+    <% errors.forEach(function(error){ %>
+        <div class="alert alert-danger"><%= error.msg %></div>
+    <% }) %>
+<% } %>
+    
 <form action="/login" method="post">
     <div class="form-group">
         <label>Username</label>
