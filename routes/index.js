@@ -1,24 +1,23 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
-var ActiveDirectory = require('ad');
+var rds = require('../services/remote-desktop-service');
+const ad = require('../services/active-directory');
+const db = require('../services/db');
 const { check, validationResult } = require('express-validator/check');
-var config = {
-  url: process.env.LDAP_SERVER_URL,
-  user: process.env.AD_ADMIN_USER,
-  pass: process.env.AD_ADMIN_PASS
-}
-var ad = new ActiveDirectory(config);
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
+  if(req.isAuthenticated()) {
+    res.redirect('/dashboard');
+  }
   res.render('index', { page: 'MyDesktop', menuId: 'home', errors: null });
 });
 /* GET dashboard page. */
 router.get('/dashboard', authenticationMiddleware(), (req, res, next) => {
   console.log(req.user);
   console.log('Is authenticated: ', req.isAuthenticated());
-  res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', displayName: 'user.displayName'});
+  res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', displayName: user.name});
 });
 
 /* POST login credentials. */
@@ -32,11 +31,25 @@ router.post('/login',
     ad.user(req.body.username).authenticate(req.body.password).then(result => {
       console.log('Result: ', result);
       if(result) {
-        console.log('Authentication:', result);
-        var username = req.body.username;
-        ad.user(username).get().then(user => {
-          console.log('User: ', user.displayName);
-          req.login(username, function(err){
+        user.username = req.body.username;
+        ad.user(user.username).get().then(adUser => {
+          console.log('User: ', adUser.displayName);
+          user.name = adUser.displayName;
+          db.query({sql: 'SELECT * FROM `users` WHERE `username`=?', values: [user.username]}, 
+          function(error, results, fields){
+            if(error) throw error;
+            if(results.length>0){
+              user.instanseId = results[0].instanseId;
+              console.log('InstanceId:', results[0].instanseId);
+            }
+            if(results.length==0){
+              db.query({sql:'INSERT INTO `users` (username, name) VALUES (?,?)', values:[user.username, user.name]},
+              function(error, results, fields){
+                if(error) throw error;
+              });
+            }
+          });
+          req.login(user.username, function(err){
             res.redirect('/dashboard');
           });
         });
@@ -69,4 +82,10 @@ function authenticationMiddleware() {
   }
 }
 
+var user = {
+  username: '',
+  name: '',
+  instanseId: '',
+  instanseIP: ''
+}
 module.exports = router;

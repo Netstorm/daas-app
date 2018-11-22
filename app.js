@@ -37,11 +37,12 @@ var options = {
 var sessionStore = new MySQLStore(options);
 // session options
 app.use(session({
-  secret: 'mhs',
+  secret: process.env.SESSION_SECRET,
   store: sessionStore,
   saveUninitialized: false,
-  resave: false
-  //cookie:{secure:false, maxAge:5000}
+  resave: true,
+  rolling: true,
+  cookie: { secure:false, maxAge:30000 }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
