@@ -1,6 +1,8 @@
 var user = {
-    username: String,
-    name: String,
-    instanceId: String,
-    instanceIP: String
-}
+    username: '',
+    name: '',
+    instanceId: '',
+    instanceIP: ''
+  }
+
+  module.exports = {user};

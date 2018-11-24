@@ -5,19 +5,29 @@ var rds = require('../services/remote-desktop-service');
 const ad = require('../services/active-directory');
 const db = require('../services/db');
 const { check, validationResult } = require('express-validator/check');
+var user = require('../models/user');
 
+router.get('/instance', (req, res, next) => {
+  rds.describeInstanceStatus().then(data =>{
+    console.log(data);
+  });
+});
 /* GET home page. */
 router.get('/', (req, res, next) => {
   if(req.isAuthenticated()) {
     res.redirect('/dashboard');
   }
-  res.render('index', { page: 'MyDesktop', menuId: 'home', errors: null });
+  else {
+    res.render('index', { page: 'MyDesktop', menuId: 'home', errors: null });
+  }
+  
 });
 /* GET dashboard page. */
 router.get('/dashboard', authenticationMiddleware(), (req, res, next) => {
   console.log(req.user);
   console.log('Is authenticated: ', req.isAuthenticated());
-  res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', displayName: user.name});
+  rds.describeInstanceStatus();
+  res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: user});
 });
 
 /* POST login credentials. */
@@ -33,20 +43,20 @@ router.post('/login',
       if(result) {
         user.username = req.body.username;
         ad.user(user.username).get().then(adUser => {
-          console.log('User: ', adUser.displayName);
+          console.log('Name: ', adUser.displayName);
           user.name = adUser.displayName;
           db.query({sql: 'SELECT * FROM `users` WHERE `username`=?', values: [user.username]}, 
           function(error, results, fields){
             if(error) throw error;
-            if(results.length>0){
-              user.instanseId = results[0].instanseId;
-              console.log('InstanceId:', results[0].instanseId);
+            if(results.length > 0) {
+              user.instanceId = results[0].instanceId;
+              user.instanceIP = results[0].instanceIP;
+              console.log('Username:', results[0].username);
+              console.log('InstanceId:', results[0].instanceId);
+              console.log('InstanceIP:', results[0].instanceIP);
             }
-            if(results.length==0){
-              db.query({sql:'INSERT INTO `users` (username, name) VALUES (?,?)', values:[user.username, user.name]},
-              function(error, results, fields){
-                if(error) throw error;
-              });
+            else {
+              createUserRecordInDB(user.username, user.name);
             }
           });
           req.login(user.username, function(err){
@@ -59,12 +69,14 @@ router.post('/login',
       }
     }).catch(err => {
       console.log('Authentication failed:', err);
-      next(err);
     });
   }
 
 });
 
+router.post('/connect', (req, res, next) => {
+  rds.startInstance(user.instanceId);
+});
 passport.serializeUser(function(username, done) {
   done(null, username);
 });
@@ -82,10 +94,11 @@ function authenticationMiddleware() {
   }
 }
 
-var user = {
-  username: '',
-  name: '',
-  instanseId: '',
-  instanseIP: ''
+var createUserRecordInDB = async(username, name) => {
+  db.query({sql:'INSERT INTO `users` (username, name) VALUES (?,?)', values:[username, name]},
+  function(error, results, fields){
+    if(error) throw error;
+  });
 }
+
 module.exports = router;

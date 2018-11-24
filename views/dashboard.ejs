@@ -11,10 +11,13 @@
         <div class="col-sm-4">
             <i class="fa fa-desktop" style="font-size:72px;color:blue"></i>
             <p>Provision Desktop</p>
-            <button type="submit" class="btn btn-warning btn-lg">Click to connect</button>
+            <form action="/connect" method="post">
+              <button type="submit" class="btn btn-warning btn-lg">Click to connect</button>
+          </form>
       </div>
       <div class="col-sm-4">
-        <p>IP: <%= displayName %></p>
+          <p>Desktop ID: <%= user.instanceId %></p>
+        <p>Desktop IP: <%= user.instanceIP %></p>
       </div>
     </div>
 </body>
