@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<% include partials/head %>
+</head>
+
+<body>
+	<% include partials/menu %>
+		<div class="container">
+			<table class="table">
+				<tr>
+					<th>Name</th>
+					<th>Username</th>
+					<th>Instance Id</th>
+					<th>Instance IP</th>
+					<th>Instance Status</th>
+					<th>Release Instance</th>
+				</tr>
+
+				<% for (var i = 0; i < vdiusers.length; i++) { %>
+					<% if (vdiusers[i].instanceStatus == 'Running') { %>
+						<tr class="info">
+							<% } else { %>
+								<tr>
+									<% } %>
+										<td>
+											<%= vdiusers[i].name %>
+										</td>
+										<td>
+											<%= vdiusers[i].username %>
+										</td>
+										<td>
+											<%= vdiusers[i].instanceId %>
+										</td>
+										<td>
+											<%= vdiusers[i].instanceIP %>
+										</td>
+										<td>
+											<%= vdiusers[i].instanceStatus %>
+										</td>
+										<td>
+											<% if (vdiusers[i].instanceStatus == 'Running') { %>
+												<button type="submit" class="btn btn-danger btn-sm disabled">Release Instance</button>
+												<% } else { %>
+													<button type="submit" class="btn btn-danger btn-sm">Release Instance</button>
+													<% } %>
+										</td>
+
+								</tr>
+								<% } %>
+			</table>
+		</div>
+</body>
+<% include partials/script %>
+
+</html>
