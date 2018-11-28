@@ -2,7 +2,8 @@ var user = {
     username: '',
     name: '',
     instanceId: '',
-    instanceIP: ''
+    instanceIP: '',
+    instanceStatus: ''
   }
 
   module.exports = {user};

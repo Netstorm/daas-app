@@ -2,25 +2,31 @@
 <html lang="en">
 
 <head>
-  <% include partials/head %>
+	<% include partials/head %>
 </head>
 
 <body class="container">
-  <% include partials/menu %>
-      <div class="row text-center">
-        <div class="col-sm-4">
-            <i class="fa fa-desktop" style="font-size:72px;color:blue"></i>
-            <p>Provision Desktop</p>
-            <form action="/connect" method="post">
-              <button type="submit" class="btn btn-warning btn-lg">Click to connect</button>
-          </form>
-      </div>
-      <div class="col-sm-4">
-          <p>Desktop ID: <%= user.instanceId %></p>
-        <p>Desktop IP: <%= user.instanceIP %></p>
-      </div>
-    </div>
+	<% include partials/navbar %>
+	<div class="row">
+		<div class="col-sm-4">
+		</br>
+			<div class="text-center" id="desktop-icon"><i class="fa fa-desktop" style="font-size:72px;color:blue"></i></div>
+			</br>
+			<table class="table text-left">	
+				<tr><td><strong>Desktop ID</td></strong><td><%= user.instanceId %></td></tr>
+				<tr><td><strong>Desktop IP</td></strong><td><%= user.instanceIP %></td></tr>
+				<tr><td><strong>Status</td></strong><td id="instanceStatus"><%= user.instanceStatus %></td></tr>
+			</table>
+			<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
+		</div>
+		<div class="col-sm-4">
+		<div class="spacer"></div>
+			<button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button><br></br>
+			<button id='shutdown-btn' data-url="/users/<%= user.username %>/<%= user.instanceId %>/stopInstance" type="submit" class="btn btn-danger btn-block">Shutdown</button>
+		</div>
+	</div>
 </body>
+
 <% include partials/script %>
 
 </html>

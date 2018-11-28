@@ -24,7 +24,7 @@ const describeInstances = async () => {
 
 }
 
-const describeInstanceStatus = async (instanceId) => {
+const getInstanceStatus = async (instanceId) => {
 	try {
 		var result = await client.request('DescribeInstanceStatus', { 'RegionId': REGION_ID });
 		var instanceStatuses = result.InstanceStatuses.InstanceStatus;
@@ -43,6 +43,7 @@ const describeInstanceStatus = async (instanceId) => {
 
 const startInstance = async (instanceId) => {
 	try {
+		console.log('StartInstance: ', instanceId);
 		var result = await client.request('StartInstance', { 'InstanceId': instanceId });
 		console.log(`StartInstance: ${JSON.stringify(result)}`);
 		return result;
@@ -70,4 +71,4 @@ const createInstance = async () => {
 }
 
 
-module.exports = { describeInstances, describeInstanceStatus, startInstance, stopInstance };
+module.exports = { describeInstances, getInstanceStatus, startInstance, stopInstance };

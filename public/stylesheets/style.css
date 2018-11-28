@@ -8,16 +8,23 @@
 }
 .navbar {
   padding-top: 15px;
-  padding-bottom: 15px;
+  padding-bottom: 20px;
   border: 0;
   border-radius: 0;
   margin-bottom: 0;
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 5px;
+}
+.navbar-brand {
+  padding-top: 5px;
+  color: #555555;
 }
 .navbar-nav  li a:hover {
   color: #1abc9c !important;
 }
 .active>a {
-color: #1abc9c !important;;
+  color: #1abc9c !important;;
+}
+.spacer {
+  padding-top: 100px;
 }

@@ -43,11 +43,11 @@ app.use(session({
   saveUninitialized: false,
   resave: true,
   rolling: true,
-  cookie: { secure:false, maxAge:30000 }
+  cookie: { secure: false, maxAge: 600000 }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

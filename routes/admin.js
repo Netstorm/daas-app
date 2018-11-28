@@ -2,17 +2,17 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 const { check, validationResult } = require('express-validator/check');
-//var rds = require('../services/remote-desktop-service');
-//const ad = require('../services/active-directory');
-//const db = require('../services/db');
+var rds = require('../services/remote-desktop-service');
+const ad = require('../services/active-directory');
+const db = require('../services/db');
 
 /* GET admin listing. */
 router.get('/', (req, res, next) => {
 	if (req.isAuthenticated()) {
-		res.redirect('/dashboard');
+		res.redirect('/admin/dashboard');
 	}
 	else {
-		res.render('admin-login', { page: 'MyDesktop Admin', menuId: 'admin-login', errors: null });
+		res.render('admin-login', { page: 'MyDesktop Admin', menuId: 'admin-login', errors: null, authenticated: false });
 	}
 });
 
@@ -23,7 +23,7 @@ router.post('/login',
 		const PAGE = 'MyDesktop Admin';
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			res.render('admin-login', { page: PAGE, menuId: 'admin', errors: errors.array() });
+			res.render('admin-login', { page: PAGE, menuId: 'admin', errors: errors.array(), authenticated: false });
 		} else {
 			ad.user(req.body.username).authenticate(req.body.password).then(result => {
 				console.log('Result: ', result);
@@ -36,18 +36,18 @@ router.post('/login',
 								user.name = adUser.displayName;
 
 								req.login(user.username, function (err) {
-									res.redirect('/dashboard');
+									res.redirect('/admin/dashboard');
 								});
 							});
 						} else {
 							var errors = [{ msg: `${user.username} is not a member of MyDesktopAdmin group` }];
-							res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors });
+							res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors, authenticated: false });
 						}
 					});
 				}
 				else {
 					var errors = [{ msg: 'Invalid Credentials' }];
-					res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors });
+					res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors, authenticated: false });
 				}
 
 			}).catch(err => {
@@ -72,7 +72,7 @@ router.get('/dashboard', (req, res, next) => {
 		instanceIP: '47.73.54.37',
 		instanceStatus: 'Stopped'
 	}]
-	res.render('admin-dashboard', { page: PAGE, menuId: 'admin-dashboard', user: user, vdiusers: vdiusers });
+	res.render('admin-dashboard', { page: PAGE, menuId: 'admin-dashboard', user: user, vdiusers: vdiusers, authenticated: true });
 });
 
 var user = {
