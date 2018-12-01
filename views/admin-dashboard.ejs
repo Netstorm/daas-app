@@ -7,7 +7,15 @@
 
 <body>
 	<% include partials/navbar %>
+</br>
 	<div class="container">
+			<div class="col-sm-6">
+				<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
+			</div>
+			<div class="col-sm-6">
+				<button id="sync-btn" data-url="/admin/loadUsers" type="submit" class="btn btn-primary">Sync Users</button>	
+				<div></br></div>
+			</div>
 		<table class="table">
 			<tr>
 				<th>Name</th>
@@ -26,26 +34,22 @@
 			<tr>
 				<% } %>
 				<td><%= vdiusers[i].name %></td>
-				<td><%= vdiusers[i].username %></td>
-				<td><%= vdiusers[i].instanceId %></td>
-				<td><%= vdiusers[i].instanceIP %></td>
-				<td><%= vdiusers[i].instanceStatus %></td>
+				<td class="username"><%= vdiusers[i].username %></td>
+				<td class="instanceId"><%= vdiusers[i].instanceId %></td>
+				<td class="instanceIP"><%= vdiusers[i].instanceIP %></td>
+				<td class="status"><%= vdiusers[i].instanceStatus %></td>
 				<td>
-					<button type="submit" class="btn btn-danger btn-sm">Create Instance</button>
+					<button id='create-btn-<%= i %>' type="submit" class="btn btn-danger btn-sm create-btn">Create Instance</button>
 				</td>
 				<td>
-					<% if (vdiusers[i].instanceStatus == 'Running') { %>
-					<button id='release-btn' type="submit" class="btn btn-danger btn-sm disabled">Release Instance</button>
-					<% } else { %>
-					<button type="submit" class="btn btn-danger btn-sm">Release Instance</button>
-					<% } %>
+					<button id='release-btn-<%= i %>' data-url="/admin/releaseInstance" type="submit" class="btn btn-danger btn-sm release-btn">Release Instance</button>
 				</td>
-
 			</tr>
 			<% } %>
 		</table>
 	</div>
 </body>
-<% include partials/script %>
+<script src="/javascripts/navbar.js"></script>
+<script src="/javascripts/admin-dashboard.js"></script>
 
 </html>

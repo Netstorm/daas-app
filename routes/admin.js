@@ -5,6 +5,7 @@ const { check, validationResult } = require('express-validator/check');
 var rds = require('../services/remote-desktop-service');
 const ad = require('../services/active-directory');
 const db = require('../services/db');
+var _ = require('lodash');
 
 /* GET admin listing. */
 router.get('/', (req, res, next) => {
@@ -29,7 +30,7 @@ router.post('/login',
 				console.log('Result: ', result);
 				if (result) {
 					user.username = req.body.username;
-					ad.user(user.username).isMemberOf('MyDesktopAdmin').then(result => {
+					ad.user(user.username).isMemberOf(process.env.ADMIN_GROUP).then(result => {
 						if (result) {
 							ad.user(user.username).get().then(adUser => {
 								console.log('Name: ', adUser.displayName);
@@ -56,24 +57,82 @@ router.post('/login',
 		}
 	});
 
-router.get('/dashboard', (req, res, next) => {
+router.get('/dashboard', authenticationMiddleware(), (req, res, next) => {
 	const PAGE = 'Admin Dashboard';
-	var vdiusers = [{
-		name: 'Test User1',
-		username: 'test.user1',
-		instanceId: 'aknfsnslv',
-		instanceIP: '47.43.87.32',
-		instanceStatus: 'Running'
-	},
-	{
-		name: 'Test User2',
-		username: 'test.user2',
-		instanceId: 'gdlgblbc-s',
-		instanceIP: '47.73.54.37',
-		instanceStatus: 'Stopped'
-	}]
-	res.render('admin-dashboard', { page: PAGE, menuId: 'admin-dashboard', user: user, vdiusers: vdiusers, authenticated: true });
+	db.getAllUsers().then(results => {
+		res.render('admin-dashboard', { page: PAGE, menuId: 'admin-dashboard', user: user, vdiusers: results, authenticated: true });
+	});
 });
+
+/** CreateInstance */
+router.post('/createInstance', function (req, res, next) {
+	var instanceId = '';
+	var instanceIP = null;
+	rds.createInstance().then(result => {
+		console.log(`Username: ${req.body.username}`);
+		console.log(`Instance created: ${result}`);
+		instanceId = result.InstanceId;
+		db.updateUser(instanceId, instanceIP, req.body.username).then(() => {
+			res.json({
+				instanceId: instanceId,
+				created: true
+			});
+		});
+	});
+});
+
+/** ReleaseInstance */
+router.post('/releaseInstance', function (req, res, next) {
+	var released = false;
+	var dbUpdated = false;
+	rds.deleteInstance(req.body.instanceId).then(result => {
+		released = true;
+		db.updateUser(null, null, req.body.username).then(() => {
+			dbUpdated = true;
+			res.json({
+				released: released,
+				dbUpdated: dbUpdated
+			});
+		});
+	});
+});
+
+router.get('/loadUsers', function (req, res) {
+	ad.user().get().then(users => {
+		var vdiusers = _.filter(users, _.flow(
+			_.property('groups'),
+			_.partialRight(_.some, { cn: process.env.STUDENT_GROUP })
+		));
+		vdiusers.forEach(user => {
+			db.ifUserExists(user.sAMAccountName).then(result => {
+				if (!result.length) {
+					db.saveUser(user.sAMAccountName, user.displayName);
+				}
+			});
+		});
+		res.json({
+			synced: true
+		});
+	});
+});
+
+
+passport.serializeUser(function (username, done) {
+	done(null, username);
+});
+
+passport.deserializeUser(function (username, done) {
+	done(null, username);
+});
+
+function authenticationMiddleware() {
+	return (req, res, next) => {
+		if (req.isAuthenticated()) {
+			return next();
+		}
+		res.redirect('/admin');
+	}
+}
 
 var user = {
 	username: '',
