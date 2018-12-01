@@ -61,12 +61,12 @@ const stopInstance = async (instanceId) => {
 	}
 }
 
-function createInstance() {
+function createInstance(username) {
 	var params = {
 		RegionId: process.env.REGION_ID,
 		ImageId: process.env.IMAGE_ID,
 		InstanceType: process.env.INSTANCE_TYPE,
-		InstanceName: 'test-create',
+		InstanceName: username,
 		// InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
 		// Period: process.env.PERIOD,
 		SecurityGroupId: process.env.SECURITY_GROUP_ID,
@@ -99,19 +99,20 @@ function deleteInstance(instanceId) {
 	});
 }
 
-const allocateEipAddress = async () => {
-	try {
-		var params = {
-			RegionId: process.env.REGION_ID
-		}
-		var result = await client.request('AllocateEipAddress', params);
-		if (result && result.RequestId) {
-			console.log(`allocateEipAddress: ${JSON.stringify(result)}`);
-			return result;
-		}
-	} catch (err) {
-		console.error(`allocateEipAddress: ${err}`);
+function allocateEipAddress() {
+	var params = {
+		RegionId: process.env.REGION_ID
 	}
+	return new Promise((resolve, reject) => {
+		client.request('AllocateEipAddress', params).then(result => {
+			if (result && result.RequestId) {
+				console.log(`allocateEipAddress: ${JSON.stringify(result)}`);
+				resolve(result);
+			}
+		}).catch(err => {
+			console.error(`allocateEipAddress: ${err}`);
+		});
+	});
 }
 
 const associateEipAddress = async (instanceId, allocationId) => {

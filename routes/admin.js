@@ -68,7 +68,7 @@ router.get('/dashboard', authenticationMiddleware(), (req, res, next) => {
 router.post('/createInstance', function (req, res, next) {
 	var instanceId = '';
 	var instanceIP = null;
-	rds.createInstance().then(result => {
+	rds.createInstance(req.body.username).then(result => {
 		console.log(`Username: ${req.body.username}`);
 		console.log(`Instance created: ${result}`);
 		instanceId = result.InstanceId;
@@ -116,6 +116,12 @@ router.get('/loadUsers', function (req, res) {
 	});
 });
 
+router.get('/getIP', function (req, res) {
+	rds.allocateEipAddress().then(result => {
+		console.log(result);
+		res.json({ data: result });
+	});
+});
 
 passport.serializeUser(function (username, done) {
 	done(null, username);
