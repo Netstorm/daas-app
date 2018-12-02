@@ -2,9 +2,9 @@
 $(document).ready(function () {
 	var status = $('#instanceStatus').text();
 	console.log(status);
-	if (status == 'Stopped') {
+	if (status == 'Stopped' || !status) {
 		$('#shutdown-btn').attr("disabled", true);
-	} else if (status == 'Running') {
+	} if (status == 'Running'  || !status) {
 		$('#start-btn').attr("disabled", true);
 	}
 });
