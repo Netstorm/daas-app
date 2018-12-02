@@ -1,4 +1,4 @@
 node_modules
 .env
 iisnode
-web.config.default
+web.config

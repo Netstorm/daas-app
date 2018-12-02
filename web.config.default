@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+<appSettings>
+            <add key="NODE_ENV" value="development" />
+            <add key="NODE_OPTIONS" value='--no-deprecation --trace-warnings' />
+            <!-- Active Directory credentials -->
+            <add key="LDAP_SERVER_URL" value="" />
+            <add key="AD_ADMIN_USER" value="" />
+            <add key="AD_ADMIN_PASS" value="" />
+            <add key="ADMIN_GROUP" value="" />
+            <add key="STUDENT_GROUP" value="" />
+            <!-- MySQL database config -->
+            <add key="DB_HOST" value="localhost" />
+            <add key="DB_PORT" value="3306" />
+            <add key="DB_USER" value="" />
+            <add key="DB_PASS" value="" />
+            <add key="DB_DBNAME" value="" />
+            <!-- Session key -->
+            <add key="SESSION_SECRET" value="" />
+            <!-- Alibaba account keys -->
+            <add key="ALICLOUD_ACCESS_KEY_ID" value="" />
+            <add key="ALICLOUD_SECRET_ACCESS_KEY" value="" />
+            <add key="ALICLOUD_ENDPOINT" value="" />
+            <!-- Instance related config -->
+            <add key="REGION_ID" value="" />
+            <add key="IMAGE_ID" value="" />
+            <add key="INSTANCE_TYPE" value="" />
+            <add key="INSTANCE_CHARGE_TYPE" value="" />
+            <add key="PERIOD" value="" />
+            <add key="VSWITCH_ID" value="" />
+            <add key="SECURITY_GROUP_ID" value="" />
+        </appSettings> 
+  <system.webServer>
+    <handlers>
+      <!-- Indicates that the app.js file is a node.js site to be handled by the iisnode module -->
+      <add name="iisnode" path="app.js" verb="*" modules="iisnode"/>
+    </handlers>
+       
+    <rewrite>
+      <rules>
+        <rule name="LogFile" patternSyntax="ECMAScript" stopProcessing="true">
+          <match url="iisnode" />
+        </rule>
+        <!-- Do not interfere with requests for node-inspector debugging -->
+        <rule name="NodeInspector" patternSyntax="ECMAScript" stopProcessing="true">
+          <match url="^app.js\/debug[\/]?" />
+        </rule>
+        <rule name="StaticContent">
+            <action type="Rewrite" url="public{REQUEST_URI}"/>
+        </rule>
+        <rule name="DynamicContent">
+          <conditions>
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="True"/>
+          </conditions>
+          <action type="Rewrite" url="app.js"/>
+        </rule>
+      </rules>
+    </rewrite>
+
+    <security>
+       <requestFiltering>
+         <hiddenSegments>
+           <add segment="node_modules" />
+         </hiddenSegments>
+       </requestFiltering>
+     </security>   
+
+<iisnode
+      node_env="development"
+      devErrorsEnabled="true"
+      loggingEnabled="true"
+      maxLogFileSizeInKB="1024"
+      maxTotalLogFileSizeInKB="8196" />
+  </system.webServer>
+</configuration>
