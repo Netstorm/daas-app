@@ -10,7 +10,7 @@
 		</div>
 		<div class="collapse navbar-collapse" id="myNavbar">
 			<ul class="nav navbar-nav navbar-right">
-				<% if (authenticated) { %>
+				<% if (isAuthenticated) { %>
 				<li id="displayName"><a href="#"><%= user.name %></a></li>
 				<li id="logout"><a href="/logout">Logout</a></li>
 				<% } %>

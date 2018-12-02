@@ -28,3 +28,6 @@
 .spacer {
   padding-top: 100px;
 }
+.bind-btn .unbind-btn {
+  float: right;
+}

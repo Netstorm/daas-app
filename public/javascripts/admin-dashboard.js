@@ -32,7 +32,7 @@ $('#sync-btn').on('click', function (event) {
   });
 });
 
-/** Release instance */
+/** Create, Release, Bind IP, Unbind IP */
 $("button").on("click", function () {
   event.preventDefault();
   event.stopPropagation();
@@ -40,6 +40,7 @@ $("button").on("click", function () {
   var username = $(this).closest("tr").find(".username").text();
   console.log(username);
   console.log(instanceId);
+  $('#loader').show();
   if ($(this).hasClass('release-btn')) {
     $.ajax({
       url: '/admin/releaseInstance',
@@ -50,11 +51,14 @@ $("button").on("click", function () {
       },
       success: function (response) {
         console.log(response);
+        $('#loader').hide();
+        location.reload();
       },
       error: function (err) {
         console.log('ERROR: ', err);
+        $('#loader').hide();
       }
-    })
+    });
   }
   else if ($(this).hasClass('create-btn')) {
     $.ajax({
@@ -66,10 +70,51 @@ $("button").on("click", function () {
       success: function (response) {
         console.log(response);
         $(this).closest("tr").find(".instanceId").text(response.instanceId);
+        $('#loader').hide();
+        location.reload();
       },
       error: function (err) {
         console.log('ERROR: ', err);
+        $('#loader').hide();
       }
-    })
+    });
   }
-})
+  else if ($(this).hasClass('bind-btn')) {
+    $.ajax({
+      url: '/admin/bindip',
+      method: 'PUT',
+      data: {
+        username: username,
+        instanceId: instanceId
+      },
+      success: function (response) {
+        console.log(response);
+        $('#loader').hide();
+        location.reload();
+      },
+      error: function (err) {
+        console.log('ERROR: ', err);
+        $('#loader').hide();
+      }
+    });
+  }
+  else if ($(this).hasClass('unbind-btn')) {
+    $.ajax({
+      url: '/admin/unbindip',
+      method: 'PUT',
+      data: {
+        username: username,
+        instanceId: instanceId
+      },
+      success: function (response) {
+        console.log(response);
+        $('#loader').hide();
+        location.reload();
+      },
+      error: function (err) {
+        console.log('ERROR: ', err);
+        $('#loader').hide();
+      }
+    });
+  }
+});

@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
 		res.redirect(`/users/${req.user}`);
 	}
 	else {
-		res.render('index', { page: 'MyDesktop', menuId: 'home', errors: null, authenticated: false });
+		res.render('index', { page: 'MyDesktop', menuId: 'home', errors: null });
 	}
 
 });

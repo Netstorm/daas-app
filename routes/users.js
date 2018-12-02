@@ -14,13 +14,13 @@ router.get('/:username', authenticationMiddleware(), function (req, res, next) {
       if (!results[0].instanceId) {
         results[0].instanceId = 'Unassigned';
         results[0].instanceIP = 'Unassigned';
-        res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0], authenticated: true });
+        res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
       } else {
         rds.getInstanceStatus(results[0].instanceId).then(status => {
           if (status) {
             results[0].instanceStatus = status;
           }
-          res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0], authenticated: true });
+          res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
         });
       }
     } else {
@@ -32,7 +32,7 @@ router.get('/:username', authenticationMiddleware(), function (req, res, next) {
 router.get('/:username/:instanceId/startInstance', authenticationMiddleware(), function (req, res, next) {
   rds.startInstance(req.params.instanceId).then(result => {
     if (result && result.RequestId) {
-      db.updateInstanceStatus(req.params.username, 'Running');
+      db.updateInstanceStatus('Running', req.params.username);
       res.json({
         started: true
       });
@@ -47,7 +47,7 @@ router.get('/:username/:instanceId/startInstance', authenticationMiddleware(), f
 router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), function (req, res, next) {
   rds.stopInstance(req.params.instanceId).then(result => {
     if (result && result.RequestId) {
-      db.updateInstanceStatus(req.params.username, 'Stopped');
+      db.updateInstanceStatus('Stopped', req.params.username);
       res.json({
         stopped: true
       });

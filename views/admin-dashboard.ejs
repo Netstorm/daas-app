@@ -13,7 +13,7 @@
 				<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
 			</div>
 			<div class="col-sm-6">
-				<button id="sync-btn" data-url="/admin/loadUsers" type="submit" class="btn btn-primary">Sync Users</button>	
+				<button id="sync-btn" data-url="/admin/loadUsers" type="submit" class="btn btn-primary btn-sm">Sync Users</button>	
 				<div></br></div>
 			</div>
 		<table class="table">
@@ -36,10 +36,18 @@
 				<td><%= vdiusers[i].name %></td>
 				<td class="username"><%= vdiusers[i].username %></td>
 				<td class="instanceId"><%= vdiusers[i].instanceId %></td>
-				<td class="instanceIP"><%= vdiusers[i].instanceIP %></td>
+				<td class="instanceIP"><%= vdiusers[i].instanceIP %>
+					<span>
+						<% if (vdiusers[i].instanceIP) { %>
+						<button id='unbind-btn-<%= i %>' type="submit" class="btn btn-success btn-sm unbind-btn">Unbind</button>
+						<% } else { %>
+						<button id='bind-btn-<%= i %>' type="submit" class="btn btn-warning btn-sm bind-btn">Bind</button>
+						<% } %>
+					</span>
+				</td>
 				<td class="status"><%= vdiusers[i].instanceStatus %></td>
 				<td>
-					<button id='create-btn-<%= i %>' type="submit" class="btn btn-danger btn-sm create-btn">Create Instance</button>
+					<button id='create-btn-<%= i %>' type="submit" class="btn btn-info btn-sm create-btn">Create Instance</button>
 				</td>
 				<td>
 					<button id='release-btn-<%= i %>' data-url="/admin/releaseInstance" type="submit" class="btn btn-danger btn-sm release-btn">Release Instance</button>

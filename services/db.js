@@ -49,6 +49,49 @@ function updateUser(instanceId, instanceIP, username) {
 	});
 }
 
+function assignInstance(instanceId, instanceStatus, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceStatus` = (?)	WHERE `username` = (?)',
+			values: [instanceId, instanceStatus, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
+function updateIp(instanceIP, allocationId, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceIP` = (?), `ipAllocationId` = (?)	WHERE `username` = (?)',
+			values: [instanceIP, allocationId, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
+function getIpDetails(username) {
+	return new Promise((resolve, reject) => {
+		connection.query({ sql: 'SELECT `instanceIP`, `ipAllocationId` FROM `users` WHERE `username`=(?)', values: [username] },
+			function (error, results, fields) {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
 function saveUser(username, name) {
 	return new Promise((resolve, reject) => {
 		connection.query({ sql: 'INSERT INTO `users` (username, name) VALUES (?,?)', values: [username, name] },
@@ -77,7 +120,7 @@ function ifUserExists(username) {
 	})
 }
 
-function updateInstanceStatus(username, instanceStatus) {
+function updateInstanceStatus(instanceStatus, username) {
 	return new Promise((resolve, reject) => {
 		connection.query({
 			sql: 'UPDATE `users` SET `instanceStatus` = (?)	WHERE `username` = (?)',
@@ -92,4 +135,7 @@ function updateInstanceStatus(username, instanceStatus) {
 	});
 }
 
-module.exports = { connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists, updateInstanceStatus };
+module.exports = {
+	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists,
+	updateInstanceStatus, assignInstance, updateIp, getIpDetails
+};

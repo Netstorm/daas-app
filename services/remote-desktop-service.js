@@ -115,6 +115,22 @@ function allocateEipAddress() {
 	});
 }
 
+function getAvailableEipAddresses() {
+	var params = {
+		RegionId: process.env.REGION_ID,
+		Status: 'Available'
+	}
+	return new Promise((resolve, reject) => {
+		client.request('DescribeEipAddresses', params).then(result => {
+			if (result && result.RequestId) {
+				resolve(result.EipAddresses.EipAddress);
+			}
+		}).catch(err => {
+			console.error(`describeEipAddresses: ${err}`);
+		});
+	});
+}
+
 const associateEipAddress = async (instanceId, allocationId) => {
 	try {
 		var params = {
@@ -165,5 +181,5 @@ const releaseEipAddress = async (allocationId) => {
 
 module.exports = {
 	describeInstances, getInstanceStatus, startInstance, stopInstance, createInstance,
-	deleteInstance, allocateEipAddress, associateEipAddress, unassociateEipAddress, releaseEipAddress
+	deleteInstance, allocateEipAddress, associateEipAddress, unassociateEipAddress, releaseEipAddress, getAvailableEipAddresses
 };

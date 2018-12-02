@@ -13,7 +13,7 @@ router.get('/', (req, res, next) => {
 		res.redirect('/admin/dashboard');
 	}
 	else {
-		res.render('admin-login', { page: 'MyDesktop Admin', menuId: 'admin-login', errors: null, authenticated: false });
+		res.render('admin-login', { page: 'MyDesktop Admin', menuId: 'admin-login', errors: null });
 	}
 });
 
@@ -24,7 +24,7 @@ router.post('/login',
 		const PAGE = 'MyDesktop Admin';
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			res.render('admin-login', { page: PAGE, menuId: 'admin', errors: errors.array(), authenticated: false });
+			res.render('admin-login', { page: PAGE, menuId: 'admin', errors: errors.array() });
 		} else {
 			ad.user(req.body.username).authenticate(req.body.password).then(result => {
 				console.log('Result: ', result);
@@ -42,13 +42,13 @@ router.post('/login',
 							});
 						} else {
 							var errors = [{ msg: `${user.username} is not a member of MyDesktopAdmin group` }];
-							res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors, authenticated: false });
+							res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors });
 						}
 					});
 				}
 				else {
 					var errors = [{ msg: 'Invalid Credentials' }];
-					res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors, authenticated: false });
+					res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors });
 				}
 
 			}).catch(err => {
@@ -60,7 +60,7 @@ router.post('/login',
 router.get('/dashboard', authenticationMiddleware(), (req, res, next) => {
 	const PAGE = 'Admin Dashboard';
 	db.getAllUsers().then(results => {
-		res.render('admin-dashboard', { page: PAGE, menuId: 'admin-dashboard', user: user, vdiusers: results, authenticated: true });
+		res.render('admin-dashboard', { page: PAGE, menuId: 'admin-dashboard', user: user, vdiusers: results });
 	});
 });
 
@@ -72,7 +72,7 @@ router.post('/createInstance', function (req, res, next) {
 		console.log(`Username: ${req.body.username}`);
 		console.log(`Instance created: ${result}`);
 		instanceId = result.InstanceId;
-		db.updateUser(instanceId, instanceIP, req.body.username).then(() => {
+		db.assignInstance(instanceId,'Stopped', req.body.username).then(() => {
 			res.json({
 				instanceId: instanceId,
 				created: true
@@ -116,10 +116,30 @@ router.get('/loadUsers', function (req, res) {
 	});
 });
 
-router.get('/getIP', function (req, res) {
-	rds.allocateEipAddress().then(result => {
-		console.log(result);
-		res.json({ data: result });
+/** Bind Elastic IP */
+router.put('/bindip', function (req, res) {
+	rds.getAvailableEipAddresses().then(ipaddresses => {
+		var ip = ipaddresses[0].IpAddress;
+		var allocationId = ipaddresses[0].AllocationId;
+		rds.associateEipAddress(req.body.instanceId, allocationId).then(() => {
+			db.updateIp(ip, allocationId, req.body.username).then(() => {
+				res.json({ instanceIp: ip, binded: true });
+			});
+		}).catch(err => {
+			console.error(err);
+			res.json({ binded: false });
+		});
+	});
+});
+
+/** Unbind Elastic IP */
+router.put('/unbindip', function (req, res) {
+	db.getIpDetails(req.body.username).then(result => {
+		rds.unassociateEipAddress(req.body.instanceId, result[0].ipAllocationId).then(() => {
+			db.updateIp(null, null, req.body.username).then(() => {
+				res.json({ unbinded: true });
+			});
+		});
 	});
 });
 
