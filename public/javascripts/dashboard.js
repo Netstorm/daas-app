@@ -86,8 +86,15 @@ $("#delete-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#loader').show();
+	var instanceId = $('#instanceId').text();
+	var ipAllocationId = $('#ipAllocationId').text();
 	$.ajax({
 		url: $(this).attr("data-url"),
+		method: 'POST',
+		data: {
+			instanceId: instanceId,
+			ipAllocationId: ipAllocationId
+		},
 		success: function (response) {
 			console.log(response);
 			$('#loader').hide();
@@ -96,7 +103,7 @@ $("#delete-btn").on("click", function () {
 		error: function (err) {
 			console.log('ERROR: ', err.statusText);
 			$('#loader').hide();
-			$('#instanceStatus').text('Failed');
+			$('#instanceStatus').text('Failed, try again');
 		}
 	});
 });

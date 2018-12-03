@@ -135,19 +135,23 @@ router.get('/:username/createInstance', function (req, res, next) {
 })
 
 /** Delete Instance */
-router.get('/:username/:instanceId/:ipAllocationId/deleteInstance', function (req, res, next) {
-  rds.deleteInstance(req.params.instanceId).then(result => {
+router.post('/:username/deleteInstance', function (req, res, next) {
+  console.log(`${req.body.instanceId} ${req.body.ipAllocationId}`)
+  rds.deleteInstance(req.body.instanceId).then(result => {
     if (result) {
-      setTimeout(function () {
-        rds.releaseEipAddress(req.params.ipAllocationId).then(() => {
-          db.saveInstanceDetails(null, null, null, null, req.params.username).then(() => {
-            dbUpdated = true;
-            res.json({
-              deleted: true
+      if (!req.body.ipAllocationId) {
+        db.saveInstanceDetails(null, null, null, null, req.params.username).then(() => {
+          res.status(200).send()
+        })
+      } else {
+        setTimeout(function () {
+          rds.releaseEipAddress(req.body.ipAllocationId).then(() => {
+            db.saveInstanceDetails(null, null, null, null, req.params.username).then(() => {
+              res.status(200).send()
             })
           })
-        })
-      }, 10000)
+        }, 10000)
+      }
     } else {
       res.status(500).send()
     }

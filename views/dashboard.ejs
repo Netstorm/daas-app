@@ -14,7 +14,7 @@
 			</br>
 			<table class="table text-left">	
 				<tr><td><strong>Desktop ID</td></strong><td id="instanceId"><%= user.instanceId %></td></tr>
-				<tr><td><strong>Desktop IP</td></strong><td id="instanceIp"><%= user.instanceIP %></td></tr>
+				<tr><td><strong>Desktop IP</td></strong><td id="<%= user.ipAllocationId %>"><%= user.instanceIP %></td></tr>
 				<tr><td><strong>Status</td></strong><td id="instanceStatus"><%= user.instanceStatus %></td></tr>
 			</table>
 			<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
@@ -24,7 +24,7 @@
 			<button id="create-btn" data-url="/users/<%= user.username %>/createInstance" type="submit" class="btn btn-primary btn-block">Create</button></br>
 			<button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button></br>
 			<button id='shutdown-btn' data-url="/users/<%= user.username %>/<%= user.instanceId %>/stopInstance" type="submit" class="btn btn-danger btn-block">Shutdown</button></br>
-			<button id="delete-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/<%= user.ipAllocationId %>/deleteInstance" type="submit" class="btn btn-danger btn-block">Delete</button></br>
+			<button id="delete-btn" data-url="/users/<%= user.username %>/deleteInstance" type="submit" class="btn btn-danger btn-block">Delete</button></br>
 		</div>
 	</div>
 	<% include partials/script %>
