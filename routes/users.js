@@ -129,9 +129,7 @@ router.get('/:username/createInstance', function (req, res, next) {
         }
       })
     } else {
-      res.json({
-        instanceCreated: false
-      })
+      res.status(500).send();
     }
   })
 })
