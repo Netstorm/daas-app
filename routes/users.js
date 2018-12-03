@@ -4,20 +4,30 @@ const db = require('../services/db');
 var rds = require('../services/remote-desktop-service');
 
 /* GET users listing. */
-// router.get('/', function (req, res, next) {
-//   res.send('OK');
-// });
+router.post('/', function (req, res, next) {
+  db.saveUser(req.body.username, req.body.name).then(results => {
+    res.json({ data: results });
+  })
+
+});
 
 router.get('/:username', authenticationMiddleware(), function (req, res, next) {
   db.getUser(req.params.username).then((results) => {
     if (results.length > 0) {
       res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
     } else {
-      var errors = [{ msg: 'Record not found' }];
-      res.render('index', { page: 'MyDesktop', menuId: 'home', errors: errors });
+      db.saveUser(req.params.username, req.query.name).then(result => {
+        if (result) {
+          db.getUser(req.params.username).then((results) => {
+            if (results.length > 0) {
+              res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
+            }
+          })
+        }
+      })
     }
-  });
-});
+  })
+})
 
 router.get('/:username/:instanceId/startInstance', authenticationMiddleware(), function (req, res, next) {
   rds.startInstance(req.params.instanceId).then(result => {

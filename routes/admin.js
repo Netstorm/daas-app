@@ -26,34 +26,29 @@ router.post('/login',
 		if (!errors.isEmpty()) {
 			res.render('admin-login', { page: PAGE, menuId: 'admin', errors: errors.array() });
 		} else {
-			ad.user(req.body.username).authenticate(req.body.password).then(result => {
-				console.log('Result: ', result);
+			ad.user(req.body.username).isMemberOf(process.env.ADMIN_GROUP).then(result => {
 				if (result) {
-					user.username = req.body.username;
-					ad.user(user.username).isMemberOf(process.env.ADMIN_GROUP).then(result => {
+					ad.user(req.body.username).authenticate(req.body.password).then(result => {
 						if (result) {
+							user.username = req.body.username;
 							ad.user(user.username).get().then(adUser => {
 								console.log('Name: ', adUser.displayName);
 								user.name = adUser.displayName;
-
 								req.login(user.username, function (err) {
 									res.redirect('/admin/dashboard');
 								});
 							});
 						} else {
-							var errors = [{ msg: `${user.username} is not a member of MyDesktopAdmin group` }];
+							var errors = [{ msg: 'Incorrect password' }];
 							res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors });
 						}
 					});
 				}
 				else {
-					var errors = [{ msg: 'Invalid Credentials' }];
+					var errors = [{ msg: `${req.body.username} is not a member of ${process.env.ADMIN_GROUP}` }];
 					res.render('admin-login', { page: PAGE, menuId: 'admin-login', errors: errors });
 				}
-
-			}).catch(err => {
-				console.log('Authentication failed:', err);
-			});
+			})
 		}
 	});
 
@@ -72,7 +67,7 @@ router.post('/createInstance', function (req, res, next) {
 		console.log(`Username: ${req.body.username}`);
 		console.log(`Instance created: ${result}`);
 		instanceId = result.InstanceId;
-		db.assignInstance(instanceId,'Stopped', req.body.username).then(() => {
+		db.assignInstance(instanceId, 'Stopped', req.body.username).then(() => {
 			res.json({
 				instanceId: instanceId,
 				created: true
@@ -97,24 +92,24 @@ router.post('/releaseInstance', function (req, res, next) {
 	});
 });
 
-router.get('/loadUsers', function (req, res) {
-	ad.user().get().then(users => {
-		var vdiusers = _.filter(users, _.flow(
-			_.property('groups'),
-			_.partialRight(_.some, { cn: process.env.STUDENT_GROUP })
-		));
-		vdiusers.forEach(user => {
-			db.ifUserExists(user.sAMAccountName).then(result => {
-				if (!result.length) {
-					db.saveUser(user.sAMAccountName, user.displayName);
-				}
-			});
-		});
-		res.json({
-			synced: true
-		});
-	});
-});
+// router.get('/loadUsers', function (req, res) {
+// 	ad.user().get().then(users => {
+// 		var vdiusers = _.filter(users, _.flow(
+// 			_.property('groups'),
+// 			_.partialRight(_.some, { cn: process.env.STUDENT_GROUP })
+// 		));
+// 		vdiusers.forEach(user => {
+// 			db.ifUserExists(user.sAMAccountName).then(result => {
+// 				if (!result.length) {
+// 					db.saveUser(user.sAMAccountName, user.displayName);
+// 				}
+// 			});
+// 		});
+// 		res.json({
+// 			synced: true
+// 		});
+// 	});
+// });
 
 /** Bind Elastic IP */
 router.put('/bindip', function (req, res) {

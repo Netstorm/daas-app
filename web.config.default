@@ -8,7 +8,7 @@
             <add key="AD_ADMIN_USER" value="" />
             <add key="AD_ADMIN_PASS" value="" />
             <add key="ADMIN_GROUP" value="" />
-            <add key="STUDENT_GROUP" value="" />
+            <add key="USER_GROUP" value="" />
             <!-- MySQL database config -->
             <add key="DB_HOST" value="localhost" />
             <add key="DB_PORT" value="3306" />

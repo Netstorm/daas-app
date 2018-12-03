@@ -1,10 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var _ = require('lodash');
 var rds = require('../services/remote-desktop-service');
 const ad = require('../services/active-directory');
 const db = require('../services/db');
 const { check, validationResult } = require('express-validator/check');
+const url = require('url');
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
@@ -25,23 +27,29 @@ router.post('/login',
 		if (!errors.isEmpty()) {
 			res.render('index', { page: 'MyDesktop', menuId: 'home', errors: errors.array() });
 		} else {
-			ad.user(req.body.username).isMemberOf(process.env.STUDENT_GROUP).then(isMember => {
-				if (isMember) {
-					ad.user(req.body.username).authenticate(req.body.password).then(result => {
-						if (result) {
-							req.login(req.body.username, function (err) {
-								res.redirect(`/users/${req.body.username}`);
-							});
-						} else {
-							var errors = [{ msg: 'Invalid credentials' }];
-							res.render('index', { page: 'MyDesktop', menuId: 'home', errors: errors });
-						}
+			ad.user(req.body.username).isMemberOf(process.env.USER_GROUP).then(result => {
+				if (result) {
+					ad.user(req.body.username).get().then(user => {
+						var name = user.displayName;
+						ad.user(req.body.username).authenticate(req.body.password).then(result => {
+							if (result) {
+								req.login(req.body.username, function (err) {
+									res.redirect(url.format({
+										pathname: `users/${req.body.username}`,
+										query: { name: name }
+									}));
+								});
+							} else {
+								var errors = [{ msg: 'Incorrect password' }];
+								res.render('index', { page: 'MyDesktop', menuId: 'home', errors: errors });
+							}
+						});
 					});
 				} else {
-					var errors = [{ msg: 'No group permissions' }];
+					var errors = [{ msg: 'Access denied' }];
 					res.render('index', { page: 'MyDesktop', menuId: 'home', errors: errors });
 				}
-			});
+			})
 		}
 	});
 
@@ -51,6 +59,21 @@ router.get('/logout', function (req, res, next) {
 	res.redirect('/');
 });
 
+router.post('/logintest', function (req, res) {
+	ad.user(req.body.username).exists().then(result => {
+		if (result) {
+			ad.user(req.body.username).get().then(user => {
+				var dn = user.dn.split(",");
+				if (dn.includes("OU=Users") && dn.includes("OU=MHS")) {
+					res.json({ data: true })
+				} else
+					res.json({ data: false })
+			})
+		} else {
+			res.json({ data: 'Does not exist' })
+		}
+	})
+})
 
 passport.serializeUser(function (username, done) {
 	done(null, username);
