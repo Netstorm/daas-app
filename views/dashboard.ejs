@@ -13,20 +13,20 @@
 			<div class="text-center" id="desktop-icon"><i class="fa fa-desktop" style="font-size:72px;color:blue"></i></div>
 			</br>
 			<table class="table text-left">	
-				<tr><td><strong>Desktop ID</td></strong><td><%= user.instanceId %></td></tr>
-				<tr><td><strong>Desktop IP</td></strong><td><%= user.instanceIP %></td></tr>
+				<tr><td><strong>Desktop ID</td></strong><td id="instanceId"><%= user.instanceId %></td></tr>
+				<tr><td><strong>Desktop IP</td></strong><td id="instanceIp"><%= user.instanceIP %></td></tr>
 				<tr><td><strong>Status</td></strong><td id="instanceStatus"><%= user.instanceStatus %></td></tr>
 			</table>
 			<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
 		</div>
 		<div class="col-sm-4">
 		<div class="spacer"></div>
-			<button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button><br></br>
-			<button id='shutdown-btn' data-url="/users/<%= user.username %>/<%= user.instanceId %>/stopInstance" type="submit" class="btn btn-danger btn-block">Shutdown</button>
+			<button id="create-btn" data-url="/users/<%= user.username %>/createInstance" type="submit" class="btn btn-primary btn-block">Create</button></br>
+			<button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button></br>
+			<button id='shutdown-btn' data-url="/users/<%= user.username %>/<%= user.instanceId %>/stopInstance" type="submit" class="btn btn-danger btn-block">Shutdown</button></br>
+			<button id="delete-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/<%= user.ipAllocationId %>/deleteInstance" type="submit" class="btn btn-danger btn-block">Delete</button></br>
 		</div>
 	</div>
+	<% include partials/script %>
 </body>
-
-<% include partials/script %>
-
 </html>

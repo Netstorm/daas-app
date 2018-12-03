@@ -76,8 +76,10 @@ function createInstance(username) {
 	return new Promise((resolve, reject) => {
 		client.request('CreateInstance', params, opts).then(result => {
 			if (result && result.RequestId) {
-				console.log(`createInstance: ${result.InstanceId}`);
+				console.log(`createInstance: ${JSON.stringify(result.InstanceId)}`);
 				resolve(result);
+			} else {
+				reject();
 			}
 		}).catch(err => {
 			console.error('createInstance: ', err);
@@ -90,11 +92,14 @@ function deleteInstance(instanceId) {
 		client.request('DeleteInstance', { 'InstanceId': instanceId }).then((result) => {
 			if (result && result.RequestId) {
 				console.log(`deleteInstance: ${JSON.stringify(result)}`);
-				resolve(result);
+				resolve(true);
 			}
 			else {
 				reject();
 			}
+		}).catch(err => {
+			console.error(`deleteInstance: ${err}`);
+			resolve(false);
 		});
 	});
 }
@@ -108,9 +113,12 @@ function allocateEipAddress() {
 			if (result && result.RequestId) {
 				console.log(`allocateEipAddress: ${JSON.stringify(result)}`);
 				resolve(result);
+			} else {
+				reject();
 			}
 		}).catch(err => {
 			console.error(`allocateEipAddress: ${err}`);
+			resolve(false);
 		});
 	});
 }
@@ -124,9 +132,12 @@ function getAvailableEipAddresses() {
 		client.request('DescribeEipAddresses', params).then(result => {
 			if (result && result.RequestId) {
 				resolve(result.EipAddresses.EipAddress);
+			} else {
+				reject();
 			}
 		}).catch(err => {
 			console.error(`describeEipAddresses: ${err}`);
+			resolve(false);
 		});
 	});
 }
@@ -161,6 +172,7 @@ const unassociateEipAddress = async (instanceId, allocationId) => {
 		}
 	} catch (err) {
 		console.error(`associateEipAddress: ${err}`);
+		return false;
 	}
 }
 
@@ -176,6 +188,7 @@ const releaseEipAddress = async (allocationId) => {
 		}
 	} catch (err) {
 		console.error(`releaseEipAddress: ${err}`);
+		return false;
 	}
 }
 

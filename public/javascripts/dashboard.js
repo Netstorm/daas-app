@@ -1,11 +1,19 @@
 /** Setup button states after page load */
 $(document).ready(function () {
 	var status = $('#instanceStatus').text();
-	console.log(status);
+	var instanceId = $('#instanceId').text();
+	if (instanceId) {
+		$('#create-btn').attr("disabled", true);
+	}
+	if (!instanceId) {
+		$('#delete-btn').attr("disabled", true);
+	}
 	if (status == 'Stopped' || !status) {
 		$('#shutdown-btn').attr("disabled", true);
-	} if (status == 'Running'  || !status) {
+	}
+	if (status == 'Running' || !status) {
 		$('#start-btn').attr("disabled", true);
+		$('#delete-btn').attr("disabled", true);
 	}
 });
 
@@ -16,21 +24,17 @@ $('#start-btn').on('click', function (event) {
 	$.ajax({
 		url: $(this).attr("data-url")
 	}).done(function (data) {
-		console.log('Start: ', data);
-		if (data.started) {
-			$('#start-btn').attr("disabled", true);
-			$('#loader').show();
-			$('#instanceStatus').text('Starting Windows');
-			setTimeout(function () {
-				$('#shutdown-btn').attr("disabled", false);
-				$('#instanceStatus').text('Running');
-				$('#loader').hide();
-			}, 8000);
-		} else {
-			$('#instanceStatus').text('Failed to start, try again');
-		}
+		$('#start-btn').attr("disabled", true);
+		$('#instanceStatus').text('Starting Windows');
+		$('#loader').show();
+		setTimeout(function () {
+			$('#shutdown-btn').attr("disabled", false);
+			$('#delete-btn').attr("disabled", true);
+			$('#instanceStatus').text('Running');
+			$('#loader').hide();
+		}, 10000);
 	}).fail(function (err) {
-		console.log(err);
+		$('#instanceStatus').text('Failed to start, try again');
 	});
 });
 
@@ -41,20 +45,59 @@ $('#shutdown-btn').on('click', function (event) {
 	$.ajax({
 		url: $(this).attr("data-url")
 	}).done(function (data) {
-		console.log('shutdown: ', data);
-		if (data.stopped) {
-			$('#shutdown-btn').attr("disabled", true);
-			$('#instanceStatus').text('Shutting Down');
-			$('#loader').show();
-			setTimeout(function () {
-				$('#start-btn').attr("disabled", false);
-				$('#instanceStatus').text('Stopped');
-				$('#loader').hide();
-			}, 8000);
-		} else {
-			$('#instanceStatus').text('Failed to shutdown, try again');
-		}
+		$('#shutdown-btn').attr("disabled", true);
+		$('#instanceStatus').text('Shutting Down');
+		$('#loader').show();
+		setTimeout(function () {
+			$('#start-btn').attr("disabled", false);
+			$('#delete-btn').attr("disabled", false);
+			$('#instanceStatus').text('Stopped');
+			$('#loader').hide();
+		}, 10000);
 	}).fail(function (err) {
-		console.log(err);
+		$('#instanceStatus').text('Request failed, try again');
+	});
+});
+
+/** Create Instance */
+$("#create-btn").on("click", function () {
+	event.preventDefault();
+	event.stopPropagation();
+	$('#loader').show();
+	$.ajax({
+		url: $(this).attr("data-url"),
+		success: function (response) {
+			if (!response.instanceCreated) {
+				$('#loader').hide();
+				$('#instanceStatus').text('Request failed, try again');
+			} else {
+				$('#loader').hide();
+				location.reload();
+			}
+		},
+		error: function (err) {
+			$('#loader').hide();
+			$('#instanceStatus').text('Failed');
+		}
+	});
+});
+
+/** Delete Instance */
+$("#delete-btn").on("click", function () {
+	event.preventDefault();
+	event.stopPropagation();
+	$('#loader').show();
+	$.ajax({
+		url: $(this).attr("data-url"),
+		success: function (response) {
+			console.log(response);
+			$('#loader').hide();
+			location.reload();
+		},
+		error: function (err) {
+			console.log('ERROR: ', err.statusText);
+			$('#loader').hide();
+			$('#instanceStatus').text('Failed');
+		}
 	});
 });

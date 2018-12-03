@@ -79,6 +79,21 @@ function updateIp(instanceIP, allocationId, username) {
 	});
 }
 
+function saveInstanceDetails(instanceId, instanceIP, allocationId, instanceStatus, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?)	WHERE `username` = (?)',
+			values: [instanceId, instanceIP, allocationId, instanceStatus, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
 function getIpDetails(username) {
 	return new Promise((resolve, reject) => {
 		connection.query({ sql: 'SELECT `instanceIP`, `ipAllocationId` FROM `users` WHERE `username`=(?)', values: [username] },
@@ -137,5 +152,5 @@ function updateInstanceStatus(instanceStatus, username) {
 
 module.exports = {
 	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists,
-	updateInstanceStatus, assignInstance, updateIp, getIpDetails
+	updateInstanceStatus, assignInstance, updateIp, getIpDetails, saveInstanceDetails
 };

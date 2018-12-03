@@ -12,7 +12,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
 // Load env variables
-// require('dotenv').config();
+require('dotenv').config();
 
 var app = express();
 
@@ -74,6 +74,6 @@ app.use(function (err, req, res, next) {
   
 });
 
-app.listen(process.env.PORT);
+// app.listen(process.env.PORT);
 
 module.exports = app;
