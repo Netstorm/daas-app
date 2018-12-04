@@ -59,6 +59,7 @@ $('#shutdown-btn').on('click', function (event) {
 		},
 		error: function (err) {
 			$('#instanceStatus').text('Request failed, try again');
+			$('#loader').hide();
 		}
 	});
 });

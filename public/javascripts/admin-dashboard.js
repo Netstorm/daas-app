@@ -1,3 +1,4 @@
+
 /** Setup button states after page load */
 $(document).ready(function () {
   $(".instanceId").each(function () {
@@ -7,6 +8,21 @@ $(document).ready(function () {
     else {
       $(this).closest("tr").find("[id^=release]").attr("disabled", true);
     }
+  })
+  $(".usage").each(function () {
+    var seconds = parseInt($(this).attr("data-usage"))
+    var minutes = moment.duration(seconds).minutes();
+    var hours = Math.trunc(moment.duration(seconds).asHours());
+    if (hours < 10) {
+      hours = "0" + hours;
+    }
+    if (minutes < 10) {
+      minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+      seconds = "0" + seconds;
+    }
+    $(this).html(hours + ':' + minutes + ':' + seconds);
   })
 });
 

@@ -8,7 +8,15 @@ const db = require('../services/db');
 const { check, validationResult } = require('express-validator/check');
 const url = require('url');
 
-/* GET home page. */
+/**
+ * Route serving login form.
+ * @name get/
+ * @function
+ * @memberof module:routers/index~indexRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
 router.get('/', (req, res, next) => {
 	if (req.isAuthenticated()) {
 		res.redirect(`/users/${req.user}`);
@@ -19,7 +27,16 @@ router.get('/', (req, res, next) => {
 
 });
 
-/* POST login credentials. */
+/**
+ * Route to authenticate active directory user
+ * @name post/login
+ * @function
+ * @memberof module:routers/index~indexRouter
+ * @inner
+ * @param {string} path - express path
+ * @param {array} functions - input validation
+ * @param {callback} middleware - express middleware.
+ */
 router.post('/login',
 	[check('username', 'Username is required').not().isEmpty(),
 	check('password', 'Password is required').not().isEmpty()], (req, res, next) => {

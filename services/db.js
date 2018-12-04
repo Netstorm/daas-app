@@ -11,7 +11,7 @@ connection.connect();
 
 function getUser(username) {
 	return new Promise((resolve, reject) => {
-		connection.query({ sql: 'SELECT * FROM `users` WHERE `username`=(?)', values: [username] },
+		connection.query({ sql: 'SELECT `username`, `name`, `instanceId`, `instanceStatus`, `instanceIP`, `ipAllocationId` FROM `users` WHERE `username`=(?)', values: [username] },
 			function (error, results, fields) {
 				if (error) {
 					reject(error);
@@ -150,7 +150,66 @@ function updateInstanceStatus(instanceStatus, username) {
 	});
 }
 
+function updateStatusAndUsage(instanceStatus, usageInSeconds, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceStatus` = (?), `usageInSeconds` = (?)	WHERE `username` = (?)',
+			values: [instanceStatus, usageInSeconds, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
+function updateStatusAndStartTime(instanceStatus, lastStartTime, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceStatus` = (?), `lastStartTime` = (?)	WHERE `username` = (?)',
+			values: [instanceStatus, lastStartTime, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
+function getLastStartTimeAndUsage(username) {
+	return new Promise((resolve, reject) => {
+		connection.query({ sql: 'SELECT `lastStartTime`, `usageInSeconds` FROM `users` WHERE `username`=(?)', values: [username] },
+			function (error, results, fields) {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
+function updateUsageTime(instanceStatus, lastStartTime, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceStatus` = (?), `lastStartTime` = (?)	WHERE `username` = (?)',
+			values: [instanceStatus, lastStartTime, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
 module.exports = {
-	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists,
-	updateInstanceStatus, assignInstance, updateIp, getIpDetails, saveInstanceDetails
+	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists, updateInstanceStatus,
+	updateStatusAndUsage, assignInstance, updateIp, getIpDetails, saveInstanceDetails,
+	updateStatusAndStartTime, getLastStartTimeAndUsage
 };

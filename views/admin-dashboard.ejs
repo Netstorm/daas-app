@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-	<% include partials/head %>
+	<% include partials/head %>\
+	<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/2.2.2/moment-duration-format.min.js"></script> -->
 </head>
 
 <body>
@@ -23,6 +24,7 @@
 				<th>Instance Id</th>
 				<th>Instance IP</th>
 				<th>Instance Status</th>
+				<th>Total Usage</th>
 				<th>Create Instance</th>
 				<th>Release Instance</th>
 			</tr>
@@ -46,6 +48,7 @@
 					</span>
 				</td>
 				<td class="status"><%= vdiusers[i].instanceStatus %></td>
+				<td class="usage" data-usage="<%= vdiusers[i].usageInSeconds %>"></td>
 				<td>
 					<button id='create-btn-<%= i %>' type="submit" class="btn btn-info btn-sm create-btn">Create Instance</button>
 				</td>
@@ -57,7 +60,8 @@
 		</table>
 	</div>
 </body>
-<script src="/javascripts/navbar.js"></script>
-<script src="/javascripts/admin-dashboard.js"></script>
+<script type="text/javascript" src="/javascripts/navbar.js"></script>
+<script type="text/javascript" src="/javascripts/admin-dashboard.js"></script>
+<script type="text/javascript" src="/javascripts/moment.min.js"></script>
 
 </html>
