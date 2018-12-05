@@ -22,6 +22,7 @@ $('#start-btn').on('click', function (event) {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#start-btn').attr("disabled", true);
+	$('#delete-btn').attr("disabled", true);
 	$('#instanceStatus').text('Starting Windows');
 	$('#loader').show();
 	$.ajax({
@@ -36,6 +37,7 @@ $('#start-btn').on('click', function (event) {
 		},
 		error: function (err) {
 			$('#instanceStatus').text('Failed to start, try again');
+			$('#loader').hide();
 		}
 	});
 });
