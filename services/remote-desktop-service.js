@@ -67,7 +67,7 @@ function createInstance(username) {
 		ImageId: process.env.IMAGE_ID,
 		InstanceType: process.env.INSTANCE_TYPE,
 		InstanceName: username,
-		// InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
+		InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
 		// Period: process.env.PERIOD,
 		SecurityGroupId: process.env.SECURITY_GROUP_ID,
 		VSwitchId: process.env.VSWITCH_ID
