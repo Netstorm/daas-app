@@ -1,5 +1,6 @@
 /** Setup button states after page load */
 $(document).ready(function () {
+	$("#error").hide()
 	var status = $('#instanceStatus').text();
 	var instanceId = $('#instanceId').text();
 	if (instanceId) {
@@ -14,6 +15,11 @@ $(document).ready(function () {
 	if (status == 'Running' || !status) {
 		$('#start-btn').attr("disabled", true);
 		$('#delete-btn').attr("disabled", true);
+	}
+	var instanceIP = $('#instanceId').text();
+	if (instanceId && !instanceIP) {
+		$('#error').text('Failed to assign IP. Delete, then create new or contact IT Services');
+		$('#error').show();
 	}
 });
 
@@ -36,8 +42,9 @@ $('#start-btn').on('click', function (event) {
 			}, 10000);
 		},
 		error: function (err) {
-			$('#instanceStatus').text('Failed to start, try again');
 			$('#loader').hide();
+			$('#error').text('Failed to start,please try again');
+			$('#error').show();
 		}
 	});
 });
@@ -60,8 +67,9 @@ $('#shutdown-btn').on('click', function (event) {
 			}, 10000);
 		},
 		error: function (err) {
-			$('#instanceStatus').text('Request failed, try again');
 			$('#loader').hide();
+			$('#error').text('Failed to shutdown, please try again');
+			$('#error').show();
 		}
 	});
 });
@@ -75,11 +83,12 @@ $("#create-btn").on("click", function () {
 		url: $(this).attr("data-url"),
 		success: function (response) {
 			$('#loader').hide();
-			location.reload();
+				location.reload();
 		},
 		error: function (err) {
 			$('#loader').hide();
-			$('#instanceStatus').text('Request failed, try again');
+			$('#error').text('Failed to create, please try again');
+			$('#error').show();
 		}
 	});
 });
@@ -104,9 +113,9 @@ $("#delete-btn").on("click", function () {
 			location.reload();
 		},
 		error: function (err) {
-			console.log('ERROR: ', err.statusText);
 			$('#loader').hide();
-			$('#instanceStatus').text('Failed, try again');
+			$('#error').text('Failed to delete, please try again');
+			$('#error').show();
 		}
 	});
 });

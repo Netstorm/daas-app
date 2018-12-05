@@ -94,39 +94,27 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
   rds.createInstance(username).then(result => {
     if (result) {
       instanceId = result.InstanceId;
-      rds.allocateEipAddress().then(result => {
+      rds.getAvailableEipAddresses().then(result => {
         if (result) {
-          instanceIP = result.EipAddress;
-          ipAllocationId = result.AllocationId;
-          rds.associateEipAddress(instanceId, ipAllocationId).then(() => {
-            db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', username).then(() => {
-              res.json({
-                instanceId: instanceId,
-                ipCreated: true
-              })
-            });
-          })
-        } else {
-          rds.getAvailableEipAddresses().then(result => {
-            if (result) {
-              instanceIP = result[0].IpAddress;
-              ipAllocationId = result[0].AllocationId;
-              rds.associateEipAddress(instanceId, ipAllocationId).then(() => {
+          instanceIP = result[0].IpAddress;
+          ipAllocationId = result[0].AllocationId;
+          setTimeout(function () {
+            rds.associateEipAddress(instanceId, ipAllocationId).then((result) => {
+              if (result) {
                 db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', username).then(() => {
-                  res.json({
-                    instanceId: instanceId,
-                    ipCreated: false
-                  })
+                  res.status(200).send();
                 })
-              })
-            } else {
-              db.saveInstanceDetails(instanceId, null, null, 'Failed to assign IP', username).then(() => {
-                res.json({
-                  instanceId: instanceId,
-                  ipCreated: false
+              } else {
+                db.saveInstanceDetails(instanceId, null, null, 'Stopped', username).then(() => {
+                  res.status(200).send();
                 })
-              })
-            }
+              }
+            })
+          }, 5000)
+        } else {
+          instanceIP = 'Unavailable, contact IT services'
+          db.saveInstanceDetails(instanceId, instanceIP, null, 'Stopped', username).then(() => {
+            res.status(200).send();
           })
         }
       })
