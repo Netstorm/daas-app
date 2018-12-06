@@ -110,7 +110,7 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
                 })
               }
             })
-          }, 5000)
+          }, 10000)
         } else {
           instanceIP = 'Unavailable, contact IT services'
           db.saveInstanceDetails(instanceId, instanceIP, null, 'Stopped', username).then(() => {
@@ -126,14 +126,19 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
 
 /** Delete Instance */
 router.post('/:username/deleteInstance', authenticationMiddleware(), function (req, res, next) {
-  console.log(`${req.body.instanceId} ${req.body.ipAllocationId}`)
-  rds.deleteInstance(req.body.instanceId).then(result => {
-    if (result) {
-      db.saveInstanceDetails(null, null, null, null, req.params.username).then(() => {
-        res.status(200).send()
+  rds.getInstanceStatus(req.body.instanceId).then((status) => {
+    if (status && status == 'Stopped') {
+      rds.deleteInstance(req.body.instanceId).then(result => {
+        if (result) {
+          db.saveInstanceDetails(null, null, null, null, req.params.username).then(() => {
+            res.status(200).send()
+          })
+        } else {
+          res.status(500).send()
+        }
       })
     } else {
-      res.status(500).send()
+      res.status(200).send('Could not delete, please try again');
     }
   })
 })

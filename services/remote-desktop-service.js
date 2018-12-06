@@ -36,6 +36,7 @@ const getInstanceStatus = async (instanceId) => {
 		return statusRecord[0].Status;
 	} catch (err) {
 		console.error('getInstanceStatus:', err);
+		return false;
 	}
 
 }
