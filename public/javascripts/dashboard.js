@@ -13,11 +13,6 @@ $(document).ready(function () {
 		$('#create-btn').attr("disabled", true);
 		$('#delete-btn').attr("disabled", true);
 	}
-	var instanceIP = $('#instanceIP').text();
-	if (instanceId && !instanceIP) {
-		$('#error').text('Failed to assign IP. Delete, then create new or contact IT Services');
-		$('#error').show();
-	}
 });
 
 /** Start instance and change status */
