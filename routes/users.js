@@ -30,19 +30,19 @@ router.get('/:username', authenticationMiddleware(), function (req, res, next) {
   })
 })
 
-router.get('/:username/:instanceId/startInstance', authenticationMiddleware(), function (req, res, next) {
-  rds.startInstance(req.params.instanceId).then(result => {
-    if (result && result.RequestId) {
-      var lastStartTime = moment().toISOString();
-      db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
-      res.json({
-        started: true
-      });
-    } else {
-      res.status(500).send();
-    }
-  });
-});
+// router.get('/:username/:instanceId/startInstance', authenticationMiddleware(), function (req, res, next) {
+//   rds.startInstance(req.params.instanceId).then(result => {
+//     if (result && result.RequestId) {
+//       var lastStartTime = moment().toISOString();
+//       db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
+//       res.json({
+//         started: true
+//       });
+//     } else {
+//       res.status(500).send();
+//     }
+//   });
+// });
 
 router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), function (req, res, next) {
   rds.stopInstance(req.params.instanceId).then(result => {
@@ -87,60 +87,82 @@ router.get('/:username/getInstanceStatus', function (req, res, next) {
 
 /** CreateInstance */
 router.get('/:username/createInstance', authenticationMiddleware(), function (req, res, next) {
+
   var username = req.params.username;
-  var instanceId = null;
-  var instanceIP = null;
-  var ipAllocationId = null;
-  rds.createInstance(username).then(result => {
-    if (result) {
-      instanceId = result.InstanceId;
-      rds.getAvailableEipAddresses().then(result => {
-        if (result) {
-          instanceIP = result[0].IpAddress;
-          ipAllocationId = result[0].AllocationId;
+  db.getInstanceId(req.params.username).then((data) => {
+    console.log(`InstanceId: ${data[0].instanceId}`)
+    if (data && data[0].instanceId) {
+      var instanceId = data.instanceId;
+      rds.startInstance(instanceId).then(result => {
+        if (result && result.RequestId) {
+          var lastStartTime = moment().toISOString();
+          db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
           setTimeout(function () {
-            rds.associateEipAddress(instanceId, ipAllocationId).then((result) => {
-              if (result) {
-                db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', username).then(() => {
-                  res.status(200).send();
-                })
-              } else {
-                db.saveInstanceDetails(instanceId, null, null, 'Stopped', username).then(() => {
-                  res.status(200).send();
-                })
-              }
-            })
-          }, 10000)
-        } else {
-          instanceIP = 'Unavailable, contact IT services'
-          db.saveInstanceDetails(instanceId, instanceIP, null, 'Stopped', username).then(() => {
             res.status(200).send();
-          })
+          }, 30000)
         }
       })
     } else {
-      res.status(500).send();
+      var instanceId = null;
+      var instanceIP = null;
+      var ipAllocationId = null;
+      rds.createInstance(username).then(result => {
+        if (result) {
+          instanceId = result.InstanceId;
+          rds.getAvailableEipAddresses().then(result => {
+            if (result) {
+              instanceIP = result[0].IpAddress;
+              ipAllocationId = result[0].AllocationId;
+              setTimeout(function () {
+                rds.associateEipAddress(instanceId, ipAllocationId).then((result) => {
+                  if (result) {
+                    rds.startInstance(instanceId).then(result => {
+                      if (result && result.RequestId) {
+                        var lastStartTime = moment().toISOString();
+                        db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
+                        res.status(200).send();
+                      } else {
+                        db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
+                        res.status(200).send();
+                      }
+                    })
+                  } else {
+                    rds.deleteInstance(instanceId).then(result => {
+                      if (result) {
+                        res.status(500).send()
+                      }
+                    })
+                  }
+                })
+              }, 40000)
+            } else {
+              rds.deleteInstance(instanceId).then(() => {
+                res.status(500).send()
+              })
+            }
+          })
+        } else {
+          res.status(500).send();
+        }
+      })
     }
   })
+
 })
 
 /** Delete Instance */
 router.post('/:username/deleteInstance', authenticationMiddleware(), function (req, res, next) {
-  rds.getInstanceStatus(req.body.instanceId).then((status) => {
-    if (status && status == 'Stopped') {
+
+      var lastStopTime = moment().toISOString();
       rds.deleteInstance(req.body.instanceId).then(result => {
         if (result) {
-          db.saveInstanceDetails(null, null, null, null, req.params.username).then(() => {
-            res.status(200).send()
-          })
+          db.saveInstanceDetailsAndUsage(null, null, null, null, lastStopTime, req.params.username);
+          res.status(200).send()
         } else {
           res.status(500).send()
         }
       })
-    } else {
-      res.status(200).send('Could not delete, please try again');
-    }
-  })
+
 })
 
 
@@ -164,6 +186,13 @@ router.post('/:username/deleteInstance', authenticationMiddleware(), function (r
 //     }
 //   })
 // })
+
+/* GET users listing. */
+// router.post('/ad/:username', function (req, res, next) {
+//   ad.user(req.params.username).get().then(results => {
+//     res.json({ data: results });
+//   })
+// });
 
 function authenticationMiddleware() {
   return (req, res, next) => {

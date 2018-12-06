@@ -22,8 +22,8 @@
 		</div>
 		<div class="col-sm-4">
 		<div class="spacer"></div>
-			<button id="create-btn" data-url="/users/<%= user.username %>/createInstance" type="submit" class="btn btn-primary btn-block">Create</button></br>
-			<button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button></br>
+			<button id="create-btn" data-url="/users/<%= user.username %>/createInstance" type="submit" class="btn btn-primary btn-block">Launch Windows PC</button></br>
+			<!-- <button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button></br> -->
 			<button id='shutdown-btn' data-url="/users/<%= user.username %>/<%= user.instanceId %>/stopInstance" type="submit" class="btn btn-danger btn-block">Shutdown</button></br>
 			<button id="delete-btn" data-url="/users/<%= user.username %>/deleteInstance" type="submit" class="btn btn-danger btn-block">Delete</button></br>
 		</div>
@@ -32,10 +32,10 @@
 				<h3>Instructions <span class="glyphicon glyphicon-bullhorn"></span></h3>    
 				<p></p>
 				<dl>
-					<dt>Create</dt>
-					<dd>To provision a new Windows 10 system.</dd>
-					<dt>Start</dt>
-					<dd>To boot the system.</dd>
+					<dt>Launch Windows PC</dt>
+					<dd>To start Windows 10 system.</dd>
+					<!-- <dt>Start</dt>
+					<dd>To boot the system.</dd> -->
 					<dt>Shutdown</dt>
 					<dd>To stop the running system after use.</dd>
 					<dt>Delete</dt>

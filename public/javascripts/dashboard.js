@@ -54,7 +54,7 @@ $('#shutdown-btn').on('click', function (event) {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#shutdown-btn').attr("disabled", true);
-	$('#instanceStatus').text('Shutting Down');
+	// $('#instanceStatus').text('Shutting Down');
 	$('#loader').show();
 	$.ajax({
 		url: $(this).attr("data-url"),
@@ -80,22 +80,23 @@ $("#create-btn").on("click", function () {
 	event.stopPropagation();
 	$('#loader').show();
 	$('#create-btn').attr("disabled", true);
-	$('#instanceStatus').text('Creating...');
+	$('#instanceStatus').text('Launching Windows...');
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
-			$('#instanceStatus').text('Created, initializing...');
+			$('#instanceStatus').text('Initializing...');
 			setTimeout(function () {
 				$('#loader').hide();
 				location.reload();
-			}, 30000)
+			}, 100000)
 
 		},
 		error: function (err) {
 			$('#loader').hide();
 			$('#instanceStatus').text('');
-			$('#error').text('Failed to create, please try again');
+			$('#error').text('Failed to launch, please try again');
 			$('#error').show();
+			$('#create-btn').attr("disabled", false);
 		}
 	});
 });
@@ -105,7 +106,8 @@ $("#delete-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#loader').show();
-	$('#instanceStatus').text('Delete request sent...');
+	$('#delete-btn').attr("disabled", true);
+	$('#instanceStatus').text('Deleting...');
 	setTimeout(() => {
 		var instanceId = $('#instanceId').text();
 		var ipAllocationId = $('#ipAllocationId').text();
@@ -125,6 +127,7 @@ $("#delete-btn").on("click", function () {
 				$('#loader').hide();
 				$('#error').text('Failed to delete, please try again');
 				$('#error').show();
+				$('#delete-btn').attr("disabled", false);
 			}
 		});
 	}, 25000);

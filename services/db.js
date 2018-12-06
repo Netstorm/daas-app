@@ -79,7 +79,7 @@ function updateIp(instanceIP, allocationId, username) {
 	});
 }
 
-function saveInstanceDetails(instanceId, instanceIP, allocationId, instanceStatus, username) {
+function saveInstanceDetailsOld(instanceId, instanceIP, allocationId, instanceStatus, username) {
 	return new Promise((resolve, reject) => {
 		connection.query({
 			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?)	WHERE `username` = (?)',
@@ -97,6 +97,19 @@ function saveInstanceDetails(instanceId, instanceIP, allocationId, instanceStatu
 function getIpDetails(username) {
 	return new Promise((resolve, reject) => {
 		connection.query({ sql: 'SELECT `instanceIP`, `ipAllocationId` FROM `users` WHERE `username`=(?)', values: [username] },
+			function (error, results, fields) {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
+function getInstanceId(username) {
+	return new Promise((resolve, reject) => {
+		connection.query({ sql: 'SELECT `instanceId` FROM `users` WHERE `username`=(?)', values: [username] },
 			function (error, results, fields) {
 				if (error) {
 					reject(error);
@@ -208,8 +221,38 @@ function updateUsageTime(instanceStatus, lastStartTime, username) {
 	});
 }
 
+function saveInstanceDetails(instanceId, instanceIP, allocationId, instanceStatus, lastStartTime, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?), `lastStartTime` = (?)	WHERE `username` = (?)',
+			values: [instanceId, instanceIP, allocationId, instanceStatus,lastStartTime, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
+function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, instanceStatus, lastStopTime, username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?), `lastStopTime` = (?)	WHERE `username` = (?)',
+			values: [instanceId, instanceIP, allocationId, instanceStatus,lastStopTime, username]
+		}, function (error, results, fields) {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
 module.exports = {
 	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists, updateInstanceStatus,
 	updateStatusAndUsage, assignInstance, updateIp, getIpDetails, saveInstanceDetails,
-	updateStatusAndStartTime, getLastStartTimeAndUsage
+	updateStatusAndStartTime, getLastStartTimeAndUsage, saveInstanceDetailsAndUsage, getInstanceId
 };
