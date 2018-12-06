@@ -8,10 +8,10 @@ $(document).ready(function () {
 		$('#delete-btn').attr("disabled", true);
 		$('#shutdown-btn').attr("disabled", true);
 	}
-	if (status == 'Stopped' || !status) {
+	if (status == 'Stopped') {
 		$('#shutdown-btn').attr("disabled", true);
 	}
-	if (status == 'Running' || !status) {
+	if (status == 'Running') {
 		$('#create-btn').attr("disabled", true);
 		$('#delete-btn').attr("disabled", true);
 	}
