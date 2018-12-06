@@ -45,18 +45,18 @@ $(document).ready(function () {
 $('#shutdown-btn').on('click', function (event) {
 	event.preventDefault();
 	event.stopPropagation();
+	$('#create-btn').attr("disabled", true);
 	$('#shutdown-btn').attr("disabled", true);
-	// $('#instanceStatus').text('Shutting Down');
+	$('#delete-btn').attr("disabled", true);
 	$('#loader').show();
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
+			$('#instanceStatus').text('Shutting Down...');
 			setTimeout(function () {
-				$('#create-btn').attr("disabled", false);
-				$('#delete-btn').attr("disabled", false);
-				$('#instanceStatus').text('Stopped');
 				$('#loader').hide();
-			}, 10000);
+				location.reload();
+			}, 100000);
 		},
 		error: function (err) {
 			$('#loader').hide();
