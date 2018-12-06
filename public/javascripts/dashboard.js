@@ -123,7 +123,6 @@ $("#delete-btn").on("click", function () {
 			},
 			error: function (err) {
 				$('#loader').hide();
-				$('#instanceStatus').text('');
 				$('#error').text('Failed to delete, please try again');
 				$('#error').show();
 			}
