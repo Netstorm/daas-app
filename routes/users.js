@@ -92,7 +92,7 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
   db.getInstanceId(req.params.username).then((data) => {
     console.log(`InstanceId: ${data[0].instanceId}`)
     if (data && data[0].instanceId) {
-      var instanceId = data.instanceId;
+      var instanceId = data[0].instanceId;
       rds.startInstance(instanceId).then(result => {
         if (result && result.RequestId) {
           var lastStartTime = moment().toISOString();
