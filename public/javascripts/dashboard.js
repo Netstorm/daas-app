@@ -3,9 +3,6 @@ $(document).ready(function () {
 	$("#error").hide()
 	var status = $('#instanceStatus').text();
 	var instanceId = $('#instanceId').text();
-	if (instanceId) {
-		$('#create-btn').attr("disabled", true);
-	}
 	if (!instanceId) {
 		$('#delete-btn').attr("disabled", true);
 	}
@@ -13,7 +10,7 @@ $(document).ready(function () {
 		$('#shutdown-btn').attr("disabled", true);
 	}
 	if (status == 'Running' || !status) {
-		$('#start-btn').attr("disabled", true);
+		$('#create-btn').attr("disabled", true);
 		$('#delete-btn').attr("disabled", true);
 	}
 	var instanceIP = $('#instanceId').text();
@@ -24,30 +21,30 @@ $(document).ready(function () {
 });
 
 /** Start instance and change status */
-$('#start-btn').on('click', function (event) {
-	event.preventDefault();
-	event.stopPropagation();
-	$('#start-btn').attr("disabled", true);
-	$('#delete-btn').attr("disabled", true);
-	$('#instanceStatus').text('Starting Windows');
-	$('#loader').show();
-	$.ajax({
-		url: $(this).attr("data-url"),
-		success: function (response) {
-			setTimeout(function () {
-				$('#shutdown-btn').attr("disabled", false);
-				$('#delete-btn').attr("disabled", true);
-				$('#instanceStatus').text('Running');
-				$('#loader').hide();
-			}, 10000);
-		},
-		error: function (err) {
-			$('#loader').hide();
-			$('#error').text('Failed to start,please try again');
-			$('#error').show();
-		}
-	});
-});
+// $('#start-btn').on('click', function (event) {
+// 	event.preventDefault();
+// 	event.stopPropagation();
+// 	$('#start-btn').attr("disabled", true);
+// 	$('#delete-btn').attr("disabled", true);
+// 	$('#instanceStatus').text('Starting Windows');
+// 	$('#loader').show();
+// 	$.ajax({
+// 		url: $(this).attr("data-url"),
+// 		success: function (response) {
+// 			setTimeout(function () {
+// 				$('#shutdown-btn').attr("disabled", false);
+// 				$('#delete-btn').attr("disabled", true);
+// 				$('#instanceStatus').text('Running');
+// 				$('#loader').hide();
+// 			}, 10000);
+// 		},
+// 		error: function (err) {
+// 			$('#loader').hide();
+// 			$('#error').text('Failed to start,please try again');
+// 			$('#error').show();
+// 		}
+// 	});
+// });
 
 /** Stop instance and change status */
 $('#shutdown-btn').on('click', function (event) {
@@ -60,7 +57,7 @@ $('#shutdown-btn').on('click', function (event) {
 		url: $(this).attr("data-url"),
 		success: function (response) {
 			setTimeout(function () {
-				$('#start-btn').attr("disabled", false);
+				$('#create-btn').attr("disabled", false);
 				$('#delete-btn').attr("disabled", false);
 				$('#instanceStatus').text('Stopped');
 				$('#loader').hide();
