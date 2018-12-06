@@ -72,6 +72,7 @@ $("#create-btn").on("click", function () {
 	event.stopPropagation();
 	$('#loader').show();
 	$('#create-btn').attr("disabled", true);
+	$('#delete-btn').attr("disabled", true);
 	$('#instanceStatus').text('Launching Windows...');
 	$.ajax({
 		url: $(this).attr("data-url"),
@@ -87,6 +88,7 @@ $("#create-btn").on("click", function () {
 			$('#loader').hide();
 			$('#error').text('Failed to launch, please try again');
 			$('#error').show();
+			$('#delete-btn').attr("disabled", false);
 			$('#create-btn').attr("disabled", false);
 		}
 	});
