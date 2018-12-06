@@ -84,15 +84,16 @@ $("#create-btn").on("click", function () {
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
-			$('#instanceStatus').text('Created, setting up...');
+			$('#instanceStatus').text('Created, initializing...');
 			setTimeout(function () {
 				$('#loader').hide();
 				location.reload();
-			}, 12000)
+			}, 30000)
 
 		},
 		error: function (err) {
 			$('#loader').hide();
+			$('#instanceStatus').text('');
 			$('#error').text('Failed to create, please try again');
 			$('#error').show();
 		}
@@ -104,24 +105,28 @@ $("#delete-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#loader').show();
-	var instanceId = $('#instanceId').text();
-	var ipAllocationId = $('#ipAllocationId').text();
-	$.ajax({
-		url: $(this).attr("data-url"),
-		method: 'POST',
-		data: {
-			instanceId: instanceId,
-			ipAllocationId: ipAllocationId
-		},
-		success: function (response) {
-			console.log(response);
-			$('#loader').hide();
-			location.reload();
-		},
-		error: function (err) {
-			$('#loader').hide();
-			$('#error').text('Failed to delete, please try again');
-			$('#error').show();
-		}
-	});
+	$('#instanceStatus').text('Delete request sent...');
+	setTimeout(() => {
+		var instanceId = $('#instanceId').text();
+		var ipAllocationId = $('#ipAllocationId').text();
+		$.ajax({
+			url: $(this).attr("data-url"),
+			method: 'POST',
+			data: {
+				instanceId: instanceId,
+				ipAllocationId: ipAllocationId
+			},
+			success: function (response) {
+				console.log(response);
+				$('#loader').hide();
+				location.reload();
+			},
+			error: function (err) {
+				$('#loader').hide();
+				$('#instanceStatus').text('');
+				$('#error').text('Failed to delete, please try again');
+				$('#error').show();
+			}
+		});
+	}, 10000);
 });
