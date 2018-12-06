@@ -79,6 +79,7 @@ $("#create-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#loader').show();
+	$('#create-btn').attr("disabled", true);
 	$('#instanceStatus').text('Creating...');
 	$.ajax({
 		url: $(this).attr("data-url"),
