@@ -4,7 +4,9 @@ $(document).ready(function () {
 	var status = $('#instanceStatus').text();
 	var instanceId = $('#instanceId').text();
 	if (!instanceId) {
+		$('#create-btn').attr("disabled", false);
 		$('#delete-btn').attr("disabled", true);
+		$('#shutdown-btn').attr("disabled", true);
 	}
 	if (status == 'Stopped' || !status) {
 		$('#shutdown-btn').attr("disabled", true);
