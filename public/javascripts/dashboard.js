@@ -13,7 +13,7 @@ $(document).ready(function () {
 		$('#create-btn').attr("disabled", true);
 		$('#delete-btn').attr("disabled", true);
 	}
-	var instanceIP = $('#instanceId').text();
+	var instanceIP = $('#instanceIP').text();
 	if (instanceId && !instanceIP) {
 		$('#error').text('Failed to assign IP. Delete, then create new or contact IT Services');
 		$('#error').show();
@@ -90,7 +90,6 @@ $("#create-btn").on("click", function () {
 		},
 		error: function (err) {
 			$('#loader').hide();
-			$('#instanceStatus').text('');
 			$('#error').text('Failed to launch, please try again');
 			$('#error').show();
 			$('#create-btn').attr("disabled", false);
