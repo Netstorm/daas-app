@@ -79,11 +79,16 @@ $("#create-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#loader').show();
+	$('#instanceStatus').text('Creating...');
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
-			$('#loader').hide();
+			$('#instanceStatus').text('Created, setting up...');
+			setTimeout(function () {
+				$('#loader').hide();
 				location.reload();
+			}, 12000)
+
 		},
 		error: function (err) {
 			$('#loader').hide();
