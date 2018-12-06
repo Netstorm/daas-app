@@ -128,5 +128,5 @@ $("#delete-btn").on("click", function () {
 				$('#error').show();
 			}
 		});
-	}, 10000);
+	}, 25000);
 });
