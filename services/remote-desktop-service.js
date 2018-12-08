@@ -64,7 +64,14 @@ const stopInstance = async (instanceId) => {
 
 function createInstance(username) {
 	var userdata = `[powershell]
-	$adminUser = "Administrator@$MHSVDI.wan"
+	Set-ExecutionPolicy unrestricted -Force
+	New-Item C:/temp -ItemType Directory -Force
+	$instanceId = "null"
+	while ($instanceId -NotLike "i-*") {
+	 Start-Sleep -s 3
+	 $instanceId = Invoke-RestMethod http://100.100.100.200/latest/meta-data/instance-id
+	}
+	$adminUser = "Administrator@MHSVDI.wan"
 	$adminPass = "MHgpu2018" | ConvertTo-SecureString -AsPlainText -Force
 	$cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
 	Try {
