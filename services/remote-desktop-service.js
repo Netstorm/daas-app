@@ -85,7 +85,7 @@ function createInstance(username) {
 		RegionId: process.env.REGION_ID,
 		ImageId: process.env.IMAGE_ID,
 		InstanceType: process.env.INSTANCE_TYPE,
-		InstanceName: username,
+		InstanceName: `WKS-${username}`,
 		Hostname: `WKS-${username}`,
 		UserData: Buffer.from(userdata).toString('base64'),
 		InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
