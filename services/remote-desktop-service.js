@@ -63,11 +63,23 @@ const stopInstance = async (instanceId) => {
 }
 
 function createInstance(username) {
+	var userdata = `$adminUser = "Administrator@$MHSVDI.wan"
+	$adminPass = "MHgpu2018" | ConvertTo-SecureString -AsPlainText -Force
+	$cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
+	Try {
+	Start-Sleep -s 5
+	Add-Computer -DomainName MHSVDI.wan -OUPath "OU=Computers,OU=MHS,DC=MHSVDI,DC=wan" -Options AccountCreate -Credential $cred -Force -Restart -erroraction 'stop'
+	}
+	Catch{
+	echo $_.Exception | Out-File C:\temp\error-joindomain.txt -Append
+	}`;
 	var params = {
 		RegionId: process.env.REGION_ID,
 		ImageId: process.env.IMAGE_ID,
 		InstanceType: process.env.INSTANCE_TYPE,
 		InstanceName: username,
+		Hostname: `WKS-${username}`,
+		UserData: Buffer.from(userdata).toString('base64'),
 		InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
 		// Period: process.env.PERIOD,
 		SecurityGroupId: process.env.SECURITY_GROUP_ID,
@@ -132,7 +144,7 @@ function getAvailableEipAddresses() {
 	}
 	return new Promise((resolve, reject) => {
 		client.request('DescribeEipAddresses', params).then(result => {
-			if (result && result.EipAddresses.EipAddress.length>0) {
+			if (result && result.EipAddresses.EipAddress.length > 0) {
 				resolve(result.EipAddresses.EipAddress);
 			} else {
 				resolve(false);
