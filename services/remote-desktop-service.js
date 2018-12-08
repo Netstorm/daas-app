@@ -63,7 +63,8 @@ const stopInstance = async (instanceId) => {
 }
 
 function createInstance(username) {
-	var userdata = `$adminUser = "Administrator@$MHSVDI.wan"
+	var userdata = `[powershell]
+	$adminUser = "Administrator@$MHSVDI.wan"
 	$adminPass = "MHgpu2018" | ConvertTo-SecureString -AsPlainText -Force
 	$cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
 	Try {
