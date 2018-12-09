@@ -32,7 +32,7 @@ const getInstanceStatus = async (instanceId) => {
 				return record;
 			}
 		});
-		console.log(`getInstanceStatus: ${JSON.stringify(statusRecord)}`);
+		console.log(`getInstanceStatus: ${JSON.stringify(statusRecord[0].Status)}`);
 		return statusRecord[0].Status;
 	} catch (err) {
 		console.error('getInstanceStatus:', err);

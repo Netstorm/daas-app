@@ -150,18 +150,23 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
 
 /** Delete Instance */
 router.post('/:username/deleteInstance', authenticationMiddleware(), function (req, res, next) {
-  rds.deleteInstance(req.body.instanceId).then(result => {
-    if (result) {
-      var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-      calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
-        db.saveInstanceDetailsAndUsage(null, null, null, null, lastStopTime, usageInSeconds, req.params.username);
+  var instanceStatus;
+  rds.getInstanceStatus(req.body.instanceId).then(status => {
+    instanceStatus = status;
+    if (status == 'Stopped') {
+      rds.deleteInstance(req.body.instanceId).then(result => {
+        if (result) {
+          db.updateOnDeleteInstance(null, null, null, null, req.params.username);
+          res.status(200).send();
+        } else {
+          res.status(500).send('Request failed');
+        }
       })
-      res.status(200).send()
     } else {
-      res.status(500).send('Incorrect instance state')
+      db.updateInstanceStatus(instanceStatus, req.params.username);
+      res.status(500).send(instanceStatus);
     }
   })
-
 })
 
 
