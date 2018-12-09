@@ -10,19 +10,18 @@ $(document).ready(function () {
     }
   })
   $(".usage").each(function () {
-    var seconds = parseInt($(this).attr("data-usage"))
-    var minutes = moment.duration(seconds).minutes();
-    var hours = Math.trunc(moment.duration(seconds).asHours());
-    if (hours < 10) {
-      hours = "0" + hours;
+    var secs = parseInt($(this).attr("data-usage"))
+    function pad(num) {
+      return ("0" + num).slice(-2);
     }
-    if (minutes < 10) {
-      minutes = "0" + minutes;
+    function hhmmss(secs) {
+      var minutes = Math.floor(secs / 60);
+      secs = secs % 60;
+      var hours = Math.floor(minutes / 60)
+      minutes = minutes % 60;
+      return pad(hours)+":"+pad(minutes)+":"+pad(secs);
     }
-    if (seconds < 10) {
-      seconds = "0" + seconds;
-    }
-    $(this).html(hours + ':' + minutes + ':' + seconds);
+    $(this).html(hhmmss(secs));
   })
 });
 
