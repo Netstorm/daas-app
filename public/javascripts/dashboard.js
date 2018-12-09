@@ -79,12 +79,16 @@ $("#create-btn").on("click", function () {
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
-			$('#instanceStatus').text('Initializing...');
-			setTimeout(function () {
+			if (response == "Stopped") {
 				$('#loader').hide();
 				location.reload();
-			}, 100000)
-
+			} else {
+				$('#instanceStatus').text('Initializing...');
+				setTimeout(function () {
+					$('#loader').hide();
+					location.reload();
+				}, 100000)
+			}
 		},
 		error: function (err) {
 			$('#loader').hide();

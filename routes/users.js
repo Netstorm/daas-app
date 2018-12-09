@@ -107,44 +107,40 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
       var instanceId = null;
       var instanceIP = null;
       var ipAllocationId = null;
-      rds.createInstance(username).then(result => {
+      rds.getAvailableEipAddresses().then(result => {
         if (result) {
-          instanceId = result.InstanceId;
-          rds.getAvailableEipAddresses().then(result => {
+          instanceIP = result[0].IpAddress;
+          ipAllocationId = result[0].AllocationId;
+          rds.createInstance(username).then(result => {
             if (result) {
-              instanceIP = result[0].IpAddress;
-              ipAllocationId = result[0].AllocationId;
-              setTimeout(function () {
+              instanceId = result.InstanceId;
+              setTimeout(() => {
                 rds.associateEipAddress(instanceId, ipAllocationId).then((result) => {
                   if (result) {
                     rds.startInstance(instanceId).then(result => {
-                      if (result && result.RequestId) {
-                        var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-                        db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
-                        res.status(200).send();
-                      } else {
+                      // if (result && result.RequestId) {
+                      //   var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+                      //   db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
+                      //   res.status(200).send();
+                      // } else {
                         db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
-                        res.status(200).send();
-                      }
+                        res.status(200).send('Stopped');
+                      // }
                     })
                   } else {
-                    rds.deleteInstance(instanceId).then(result => {
-                      if (result) {
-                        res.status(500).send()
-                      }
-                    })
+                    setTimeout(() => {
+                      rds.deleteInstance(instanceId)
+                    }, 30000);
+                    res.status(500).send('Failed to assign IP');
                   }
                 })
               }, 45000)
             } else {
-              setTimeout(function () {
-                rds.deleteInstance(instanceId);
-              }, 70000)
-              res.status(500).send('IP Unavailable')
+              res.status(500).send('Could not create instance');
             }
           })
         } else {
-          res.status(500).send('Could not create instance');
+          res.status(500).send('IP Unavailable')
         }
       })
     }
