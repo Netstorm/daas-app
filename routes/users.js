@@ -118,14 +118,14 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
                 rds.associateEipAddress(instanceId, ipAllocationId).then((result) => {
                   if (result) {
                     rds.startInstance(instanceId).then(result => {
-                      // if (result && result.RequestId) {
-                      //   var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-                      //   db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
-                      //   res.status(200).send();
-                      // } else {
+                      if (result && result.RequestId) {
+                        var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+                        db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
+                        res.status(200).send();
+                      } else {
                         db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
                         res.status(200).send('Stopped');
-                      // }
+                      }
                     })
                   } else {
                     setTimeout(() => {
