@@ -171,17 +171,19 @@ router.post('/:username/deleteInstance', authenticationMiddleware(), function (r
 
 
 function calculateUsage(stopTime, username) {
+  var usage;
   return new Promise((resolve, reject) => {
     db.getLastStartTimeAndUsage(username).then((result) => {
-      if (result) {
+      usage = result[0].usageInSeconds;
+      if (result && result[0].lastStartTime) {
         var lastStartTime = moment(result[0].lastStartTime, "DD-MM-YYYY HH:mm:ss")
         var lastStopTime = moment(stopTime, "DD-MM-YYYY HH:mm:ss")
         var diffInMs = lastStopTime.diff(lastStartTime);
         var runningTime = moment.duration(diffInMs).asSeconds();
-        var usageInSeconds = result[0].usageInSeconds + runningTime;
-        console.log('running: ', runningTime);
-        console.log('usage: ', usageInSeconds);
-        resolve(usageInSeconds)
+        usage = usage + runningTime;
+        resolve(usage)
+      } else {
+        resolve(usage)
       }
     })
   })
