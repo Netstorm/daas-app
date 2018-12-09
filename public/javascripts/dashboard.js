@@ -108,7 +108,7 @@ $("#delete-btn").on("click", function () {
 	$('#loader').show();
 	$('#delete-btn').attr("disabled", true);
 	$('#instanceStatus').text('Deleting...');
-	setTimeout(() => {
+	setTimeout(function () {
 		var instanceId = $('#instanceId').text();
 		var ipAllocationId = $('#ipAllocationId').text();
 		$.ajax({
