@@ -185,6 +185,8 @@ function calculateUsage(stopTime, username) {
       } else {
         resolve(usage)
       }
+    }).catch(err => {
+      console.log(`calculateUsage: ${err}`);
     })
   })
 }

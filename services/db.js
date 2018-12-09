@@ -248,8 +248,11 @@ function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, insta
 			} else {
 				resolve(results);
 			}
+		}).catch(err => {
+			console.log(`saveInstanceDetailsAndUsage: ${err}`);
+			resolve(false);
 		});
-	});
+	})
 }
 
 module.exports = {
