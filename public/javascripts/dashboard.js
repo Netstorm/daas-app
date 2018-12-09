@@ -88,6 +88,7 @@ $("#create-btn").on("click", function () {
 		},
 		error: function (err) {
 			$('#loader').hide();
+			$('#instanceStatus').text(err.responseText);
 			$('#error').text('Failed to launch, please try again');
 			$('#error').show();
 			$('#delete-btn').attr("disabled", false);
@@ -120,6 +121,7 @@ $("#delete-btn").on("click", function () {
 			},
 			error: function (err) {
 				$('#loader').hide();
+				$('#instanceStatus').text(err.responseText);
 				$('#error').text('Failed to delete, please try again');
 				$('#error').show();
 				$('#delete-btn').attr("disabled", false);

@@ -47,10 +47,11 @@ router.get('/:username', authenticationMiddleware(), function (req, res, next) {
 router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), function (req, res, next) {
   rds.stopInstance(req.params.instanceId).then(result => {
     if (result && result.RequestId) {
-      db.updateInstanceStatus('Stopped', req.params.username);
-      res.json({
-        stopped: true
-      });
+      var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+      calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
+        db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
+      })
+      res.status(200).send();
     } else {
       res.status(500).send();
     }
@@ -62,10 +63,11 @@ router.get('/:username/:instanceId/stopIdleInstance', authenticationMiddleware()
   console.log('Idle instanceId: ', req.params.instanceId);
   rds.stopInstance(req.params.instanceId).then(result => {
     if (result && result.RequestId) {
-      db.updateInstanceStatus('Stopped', req.params.username);
-      res.json({
-        stopped: true
-      });
+      var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+      calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
+        db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
+      })
+      res.status(200).send();
     } else {
       res.status(500).send();
     }
@@ -94,7 +96,7 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
       var instanceId = data[0].instanceId;
       rds.startInstance(instanceId).then(result => {
         if (result && result.RequestId) {
-          var lastStartTime = moment().toISOString();
+          var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
           db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
           setTimeout(function () {
             res.status(200).send();
@@ -117,7 +119,7 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
                   if (result) {
                     rds.startInstance(instanceId).then(result => {
                       if (result && result.RequestId) {
-                        var lastStartTime = moment().toISOString();
+                        var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
                         db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
                         res.status(200).send();
                       } else {
@@ -133,15 +135,16 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
                     })
                   }
                 })
-              }, 40000)
+              }, 45000)
             } else {
-              rds.deleteInstance(instanceId).then(() => {
-                res.status(500).send()
-              })
+              setTimeout(function () {
+                rds.deleteInstance(instanceId);
+              }, 70000)
+              res.status(500).send('IP Unavailable')
             }
           })
         } else {
-          res.status(500).send();
+          res.status(500).send('Could not create instance');
         }
       })
     }
@@ -151,47 +154,37 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
 
 /** Delete Instance */
 router.post('/:username/deleteInstance', authenticationMiddleware(), function (req, res, next) {
-
-      var lastStopTime = moment().toISOString();
-      rds.deleteInstance(req.body.instanceId).then(result => {
-        if (result) {
-          db.saveInstanceDetailsAndUsage(null, null, null, null, lastStopTime, req.params.username);
-          res.status(200).send()
-        } else {
-          res.status(500).send()
-        }
+  rds.deleteInstance(req.body.instanceId).then(result => {
+    if (result) {
+      var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+      calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
+        db.saveInstanceDetailsAndUsage(null, null, null, null, lastStopTime, usageInSeconds, req.params.username);
       })
+      res.status(200).send()
+    } else {
+      res.status(500).send('Incorrect instance state')
+    }
+  })
 
 })
 
 
-// router.get('/:username/getUsage', function (req, res) {
-//   db.getLastStartTimeAndUsage(req.params.username).then((result) => {
-//     if (result) {
-//       console.log('Result[0]: ', result[0])
-//       console.log('last: ', result[0].lastStartTime)
-//       var stopTime = moment().toISOString();
-//       var lastStartTime = moment(result[0].lastStartTime)
-//       console.log('lastToDate: ', lastStartTime)
-//       var runningTime = lastStartTime.diff(stopTime, 'secs');
-//       console.log('running: ', runningTime);
-//       res.json({
-//         data: result
-//       });
-//     } else {
-//       res.json({
-//         error: result
-//       })
-//     }
-//   })
-// })
-
-/* GET users listing. */
-// router.post('/ad/:username', function (req, res, next) {
-//   ad.user(req.params.username).get().then(results => {
-//     res.json({ data: results });
-//   })
-// });
+function calculateUsage(stopTime, username) {
+  return new Promise((resolve, reject) => {
+    db.getLastStartTimeAndUsage(username).then((result) => {
+      if (result) {
+        var lastStartTime = moment(result[0].lastStartTime, "DD-MM-YYYY HH:mm:ss")
+        var lastStopTime = moment(stopTime, "DD-MM-YYYY HH:mm:ss")
+        var diffInMs = lastStopTime.diff(lastStartTime);
+        var runningTime = moment.duration(diffInMs).asSeconds();
+        var usageInSeconds = result[0].usageInSeconds + runningTime;
+        console.log('running: ', runningTime);
+        console.log('usage: ', usageInSeconds);
+        resolve(usageInSeconds)
+      }
+    })
+  })
+}
 
 function authenticationMiddleware() {
   return (req, res, next) => {

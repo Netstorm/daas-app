@@ -89,7 +89,6 @@ function createInstance(username) {
 		Hostname: `WKS-${username}`,
 		UserData: Buffer.from(userdata).toString('base64'),
 		InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
-		// Period: process.env.PERIOD,
 		SecurityGroupId: process.env.SECURITY_GROUP_ID,
 		VSwitchId: process.env.VSWITCH_ID
 	}
@@ -100,7 +99,7 @@ function createInstance(username) {
 				console.log(`createInstance: ${JSON.stringify(result.InstanceId)}`);
 				resolve(result);
 			} else {
-				resolve(false);
+				reject();
 			}
 		}).catch(err => {
 			console.error('createInstance: ', err);

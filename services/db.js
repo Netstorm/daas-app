@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var moment = require('moment');
 
 var connection = mysql.createConnection({
 	host: process.env.DB_HOST,
@@ -163,11 +164,11 @@ function updateInstanceStatus(instanceStatus, username) {
 	});
 }
 
-function updateStatusAndUsage(instanceStatus, usageInSeconds, username) {
+function updateStatusAndUsage(instanceStatus, lastStopTime, usageInSeconds, username) {
 	return new Promise((resolve, reject) => {
 		connection.query({
-			sql: 'UPDATE `users` SET `instanceStatus` = (?), `usageInSeconds` = (?)	WHERE `username` = (?)',
-			values: [instanceStatus, usageInSeconds, username]
+			sql: 'UPDATE `users` SET `instanceStatus` = (?), `lastStopTime` = (?), `usageInSeconds` = (?)	WHERE `username` = (?)',
+			values: [instanceStatus, lastStopTime, usageInSeconds, username]
 		}, function (error, results, fields) {
 			if (error) {
 				reject(error);
@@ -225,7 +226,7 @@ function saveInstanceDetails(instanceId, instanceIP, allocationId, instanceStatu
 	return new Promise((resolve, reject) => {
 		connection.query({
 			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?), `lastStartTime` = (?)	WHERE `username` = (?)',
-			values: [instanceId, instanceIP, allocationId, instanceStatus,lastStartTime, username]
+			values: [instanceId, instanceIP, allocationId, instanceStatus, lastStartTime, username]
 		}, function (error, results, fields) {
 			if (error) {
 				reject(error);
@@ -236,11 +237,11 @@ function saveInstanceDetails(instanceId, instanceIP, allocationId, instanceStatu
 	});
 }
 
-function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, instanceStatus, lastStopTime, username) {
+function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, instanceStatus, lastStopTime, usageInSeconds, username) {
 	return new Promise((resolve, reject) => {
 		connection.query({
-			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?), `lastStopTime` = (?)	WHERE `username` = (?)',
-			values: [instanceId, instanceIP, allocationId, instanceStatus,lastStopTime, username]
+			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceIP` = (?), `ipAllocationId` = (?), `instanceStatus` = (?), `lastStopTime` = (?), `usageInSeconds` = (?)	WHERE `username` = (?)',
+			values: [instanceId, instanceIP, allocationId, instanceStatus, lastStopTime, usageInSeconds, username]
 		}, function (error, results, fields) {
 			if (error) {
 				reject(error);
