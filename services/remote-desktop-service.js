@@ -71,6 +71,7 @@ function createInstance(username) {
 	 Start-Sleep -s 3
 	 $instanceId = Invoke-RestMethod http://100.100.100.200/latest/meta-data/instance-id
 	}
+	Set-DnsClientServerAddress -InterfaceAlias "Ethernet 2" -ServerAddresses "172.27.118.132","100.100.2.136"
 	$adminUser = "Administrator@MHSVDI.wan"
 	$adminPass = "MHgpu2018" | ConvertTo-SecureString -AsPlainText -Force
 	$cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
