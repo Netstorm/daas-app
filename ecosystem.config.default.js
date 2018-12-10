@@ -6,6 +6,9 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: 3000,
+        // SSL Certificate
+        CERT_PATH: "",
+        CERT_PASSPHRASE: "",
         //  Active Directory
         LDAP_SERVER_URL: "",
         AD_ADMIN_USER: "",

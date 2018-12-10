@@ -1,3 +1,5 @@
+var https = require('https');
+var fs = require('fs');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -13,6 +15,12 @@ var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
 // Load env variables
 require('dotenv').config();
+
+// HTTPS options
+// var httpsOptions = {
+//   pfx: fs.readFileSync(process.env.CERT_PATH),
+//   passphrase: process.env.CERT_PASSPHRASE
+// };
 
 var app = express();
 
@@ -74,6 +82,15 @@ app.use(function (err, req, res, next) {
   
 });
 
-// app.listen(process.env.PORT);
+// app.use('*', function (req, res, next) {
+//   if (!req.secure && process.env.NODE_ENV == 'production') {
+//     var secureUrl = "https://" + req.headers['host'] + req.url;
+//     res.writeHead(301, { "Location": secureUrl });
+//     res.end();
+//   }
+//   next();
+// });
+
+// https.createServer(httpsOptions, app).listen(3001);
 
 module.exports = app;
