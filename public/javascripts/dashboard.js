@@ -108,11 +108,12 @@ $("#delete-btn").on("click", function () {
 	$('#loader').show();
 	$('#delete-btn').attr("disabled", true);
 	$('#instanceStatus').text('Deleting...');
+	var url = $(this).attr("data-url");
 	setTimeout(function () {
 		var instanceId = $('#instanceId').text();
 		var ipAllocationId = $('#ipAllocationId').text();
 		$.ajax({
-			url: $(this).attr("data-url"),
+			url: url,
 			method: 'POST',
 			data: {
 				instanceId: instanceId,
