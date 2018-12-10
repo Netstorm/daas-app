@@ -72,7 +72,6 @@ function createInstance(username) {
 	 $instanceId = Invoke-RestMethod http://100.100.100.200/latest/meta-data/instance-id
 	}
 	$interfaceIndex = (Get-NetAdapter | Where-object {$_.Name -like "*Ethernet*" } | Select-Object -ExpandProperty InterfaceIndex)
-	Set-DnsClientServerAddress  -ServerAddresses "10.0.104.209"
 	Set-DnsClientServerAddress -InterfaceIndex $interfaceIndex -ServerAddresses "172.27.118.132","100.100.2.136"
 	$domain = "MHSVDI.wan"
 	$adminUser = "MHSVDI\\Administrator"
