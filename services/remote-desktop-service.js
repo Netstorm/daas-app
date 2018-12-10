@@ -65,22 +65,25 @@ const stopInstance = async (instanceId) => {
 function createInstance(username) {
 	var userdata = `[powershell]
 	Set-ExecutionPolicy unrestricted -Force
-	New-Item C:/temp -ItemType Directory -Force
+	New-Item C:\\temp -ItemType Directory -Force
 	$instanceId = "null"
 	while ($instanceId -NotLike "i-*") {
 	 Start-Sleep -s 3
 	 $instanceId = Invoke-RestMethod http://100.100.100.200/latest/meta-data/instance-id
 	}
-	Set-DnsClientServerAddress -InterfaceAlias "Ethernet 2" -ServerAddresses "172.27.118.132","100.100.2.136"
-	$adminUser = "Administrator@MHSVDI.wan"
+	$interfaceIndex = (Get-NetAdapter | Where-object {$_.Name -like "*Ethernet*" } | Select-Object -ExpandProperty InterfaceIndex)
+	Set-DnsClientServerAddress  -ServerAddresses "10.0.104.209"
+	Set-DnsClientServerAddress -InterfaceIndex $interfaceIndex -ServerAddresses "172.27.118.132","100.100.2.136"
+	$domain = "MHSVDI.wan"
+	$adminUser = "MHSVDI\\Administrator"
 	$adminPass = "MHgpu2018" | ConvertTo-SecureString -AsPlainText -Force
 	$cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
 	Try {
 	Start-Sleep -s 5
-	Add-Computer -DomainName MHSVDI.wan -OUPath "OU=Computers,OU=MHS,DC=MHSVDI,DC=wan" -Options AccountCreate -Credential $cred -Force -Restart -erroraction 'stop'
+	Add-Computer -DomainName $domain -OUPath "OU=Computers,OU=MHS,DC=MHSVDI,DC=wan" -Options AccountCreate -Credential $cred -Force -Restart -erroraction 'stop'
 	}
 	Catch{
-	echo $_.Exception | Out-File C:\temp\error-joindomain.txt -Append
+	echo $_.Exception | Out-File C:\\temp\\error-joindomain.txt -Append
 	}`;
 	var params = {
 		RegionId: process.env.REGION_ID,

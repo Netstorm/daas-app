@@ -134,7 +134,7 @@ router.get('/:username/createInstance', authenticationMiddleware(), function (re
                     res.status(500).send('Failed to assign IP');
                   }
                 })
-              }, 45000)
+              }, 100000)
             } else {
               res.status(500).send('Could not create instance');
             }
