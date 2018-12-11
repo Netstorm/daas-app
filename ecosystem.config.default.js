@@ -6,6 +6,12 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: 3000,
+        // Domain Controller
+        DC_PRIMARY_DNS: "",
+        DC_SECONDARY_DNS: "",
+        DOMAIN: "",
+        NETBIOS: "",
+        OU_PATH: "",
         // SSL Certificate
         CERT_PATH: "",
         CERT_PASSPHRASE: "",

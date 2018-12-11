@@ -1,5 +1,6 @@
 var RPCClient = require('@alicloud/pop-core').RPCClient;
 var _ = require('lodash');
+var joinDomain = require('./join-domain');
 
 // Account config and request options
 var client = new RPCClient({
@@ -63,34 +64,13 @@ const stopInstance = async (instanceId) => {
 }
 
 function createInstance(username) {
-	var userdata = `[powershell]
-	Set-ExecutionPolicy unrestricted -Force
-	New-Item C:\\temp -ItemType Directory -Force
-	$instanceId = "null"
-	while ($instanceId -NotLike "i-*") {
-	 Start-Sleep -s 3
-	 $instanceId = Invoke-RestMethod http://100.100.100.200/latest/meta-data/instance-id
-	}
-	$interfaceIndex = (Get-NetAdapter | Where-object {$_.Name -like "*Ethernet*" } | Select-Object -ExpandProperty InterfaceIndex)
-	Set-DnsClientServerAddress -InterfaceIndex $interfaceIndex -ServerAddresses "172.27.118.132","100.100.2.136"
-	$domain = "MHSVDI.wan"
-	$adminUser = "MHSVDI\\Administrator"
-	$adminPass = "MHgpu2018" | ConvertTo-SecureString -AsPlainText -Force
-	$cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
-	Try {
-	Start-Sleep -s 5
-	Add-Computer -DomainName $domain -OUPath "OU=Computers,OU=MHS,DC=MHSVDI,DC=wan" -Options AccountCreate -Credential $cred -Force -Restart -erroraction 'stop'
-	}
-	Catch{
-	echo $_.Exception | Out-File C:\\temp\\error-joindomain.txt -Append
-	}`;
 	var params = {
 		RegionId: process.env.REGION_ID,
 		ImageId: process.env.IMAGE_ID,
 		InstanceType: process.env.INSTANCE_TYPE,
 		InstanceName: `WKS-${username}`,
 		Hostname: `WKS-${username}`,
-		UserData: Buffer.from(userdata).toString('base64'),
+		UserData: Buffer.from(joinDomain.userdata).toString('base64'),
 		InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
 		SecurityGroupId: process.env.SECURITY_GROUP_ID,
 		VSwitchId: process.env.VSWITCH_ID
