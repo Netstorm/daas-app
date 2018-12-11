@@ -70,7 +70,7 @@ function createInstance(username) {
 		InstanceType: process.env.INSTANCE_TYPE,
 		InstanceName: `WKS-${username}`,
 		Hostname: `WKS-${username}`,
-		UserData: Buffer.from(joinDomain.userdata).toString('base64'),
+		// UserData: Buffer.from(joinDomain.userdata).toString('base64'),
 		InstanceChargeType: process.env.INSTANCE_CHARGE_TYPE,
 		SecurityGroupId: process.env.SECURITY_GROUP_ID,
 		VSwitchId: process.env.VSWITCH_ID
