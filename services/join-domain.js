@@ -24,6 +24,9 @@ module.exports = {
 	$adminPass = "${process.env.AD_ADMIN_PASS}" | ConvertTo-SecureString -AsPlainText -Force
   $cred = New-Object -typename System.Management.Automation.PSCredential($adminUser, $adminPass)
     Try {
+      Log-Write "INFO Joining workgroup"
+      Remove-Computer -WorkgroupName WORKGROUP -Credential $cred -Force -ErrorAction 'Stop'
+      Start-Sleep -s 5
       Log-Write "INFO Adding computer to domain $domain"
 			Add-Computer -DomainName $domain -OUPath "${process.env.OU_PATH}" -Options AccountCreate -Credential $cred -Force -Restart -ErrorAction 'Stop'
   	}
