@@ -17,33 +17,7 @@ $(document).ready(function () {
 	}
 });
 
-/** Start instance and change status */
-// $('#start-btn').on('click', function (event) {
-// 	event.preventDefault();
-// 	event.stopPropagation();
-// 	$('#start-btn').attr("disabled", true);
-// 	$('#delete-btn').attr("disabled", true);
-// 	$('#instanceStatus').text('Starting Windows');
-// 	$('#loader').show();
-// 	$.ajax({
-// 		url: $(this).attr("data-url"),
-// 		success: function (response) {
-// 			setTimeout(function () {
-// 				$('#shutdown-btn').attr("disabled", false);
-// 				$('#delete-btn').attr("disabled", true);
-// 				$('#instanceStatus').text('Running');
-// 				$('#loader').hide();
-// 			}, 10000);
-// 		},
-// 		error: function (err) {
-// 			$('#loader').hide();
-// 			$('#error').text('Failed to start,please try again');
-// 			$('#error').show();
-// 		}
-// 	});
-// });
-
-/** Stop instance and change status */
+/** Stop Instance */
 $('#shutdown-btn').on('click', function (event) {
 	event.preventDefault();
 	event.stopPropagation();
@@ -57,7 +31,7 @@ $('#shutdown-btn').on('click', function (event) {
 			setTimeout(function () {
 				$('#loader').hide();
 				location.reload();
-			}, 45000);
+			}, 60000);
 		},
 		error: function (err) {
 			$('#loader').hide();
@@ -68,7 +42,7 @@ $('#shutdown-btn').on('click', function (event) {
 	});
 });
 
-/** Create Instance */
+/** Start or Create Instance */
 $("#create-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
