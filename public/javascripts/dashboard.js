@@ -47,23 +47,23 @@ $(document).ready(function () {
 $('#shutdown-btn').on('click', function (event) {
 	event.preventDefault();
 	event.stopPropagation();
-	$('#create-btn').attr("disabled", true);
 	$('#shutdown-btn').attr("disabled", true);
-	$('#delete-btn').attr("disabled", true);
 	$('#loader').show();
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
 			$('#instanceStatus').text('Shutting Down...');
+			$('#error').hide();
 			setTimeout(function () {
 				$('#loader').hide();
 				location.reload();
-			}, 60000);
+			}, 45000);
 		},
 		error: function (err) {
 			$('#loader').hide();
 			$('#error').text('Failed to shutdown, please try again');
 			$('#error').show();
+			$('#shutdown-btn').attr("disabled", false);
 		}
 	});
 });
