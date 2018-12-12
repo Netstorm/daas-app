@@ -30,19 +30,23 @@ router.get('/:username', authenticationMiddleware(), function (req, res, next) {
   })
 })
 
-// router.get('/:username/:instanceId/startInstance', authenticationMiddleware(), function (req, res, next) {
-//   rds.startInstance(req.params.instanceId).then(result => {
-//     if (result && result.RequestId) {
-//       var lastStartTime = moment().toISOString();
-//       db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
-//       res.json({
-//         started: true
-//       });
-//     } else {
-//       res.status(500).send();
-//     }
-//   });
-// });
+router.put('/:username/startInstance', authenticationMiddleware(), function (req, res, next) {
+  db.getInstanceId(req.params.username).then((data) => {
+    if (data && data[0].instanceId) {
+      rds.startInstance(data[0].instanceId).then(result => {
+        if (result && result.RequestId) {
+          var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+          db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
+          res.status(200).send('Running');
+        } else {
+          res.status(500).send('Start request failed, please try again!');
+        }
+      })
+    } else {
+      res.status(200).send('No instance is assigned');
+    }
+  })
+})
 
 router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), function (req, res, next) {
   rds.stopInstance(req.params.instanceId).then(result => {
@@ -88,61 +92,40 @@ router.get('/:username/getInstanceStatus', function (req, res, next) {
 })
 
 /** CreateInstance */
-router.get('/:username/createInstance', authenticationMiddleware(), function (req, res, next) {
-
+router.post('/:username/createInstance', authenticationMiddleware(), function (req, res, next) {
   var username = req.params.username;
-  db.getInstanceId(req.params.username).then((data) => {
-    if (data && data[0].instanceId) {
-      var instanceId = data[0].instanceId;
-      rds.startInstance(instanceId).then(result => {
-        if (result && result.RequestId) {
-          var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-          db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
-          setTimeout(function () {
-            res.status(200).send();
-          }, 30000)
-        }
-      })
-    } else {
-      var instanceId = null;
-      var instanceIP = null;
-      var ipAllocationId = null;
-      rds.getAvailableEipAddresses().then(result => {
+  var instanceId = null;
+  var instanceIP = null;
+  var ipAllocationId = null;
+  rds.getAvailableEipAddresses().then(result => {
+    if (result) {
+      instanceIP = result[0].IpAddress;
+      ipAllocationId = result[0].AllocationId;
+      rds.createInstance(username).then(result => {
         if (result) {
-          instanceIP = result[0].IpAddress;
-          ipAllocationId = result[0].AllocationId;
-          rds.createInstance(username).then(result => {
-            if (result) {
-              instanceId = result.InstanceId;
-              setTimeout(() => {
-                rds.associateEipAddress(instanceId, ipAllocationId).then((result) => {
-                  if (result) {
-                    rds.startInstance(instanceId).then(result => {
-                      if (result && result.RequestId) {
-                        var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-                        db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Running', lastStartTime, username);
-                        res.status(200).send();
-                      } else {
-                        db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
-                        res.status(200).send('Stopped');
-                      }
-                    })
-                  } else {
-                    setTimeout(() => {
-                      rds.deleteInstance(instanceId)
-                    }, 30000);
-                    res.status(500).send('Failed to assign IP');
-                  }
-                })
-              }, 45000)
+          instanceId = result.InstanceId;
+          isInstanceStopped(instanceId).then(stopped => {
+            if (stopped) {
+              rds.bindIpAddress(instanceId, ipAllocationId).then((result) => {
+                if (result) {
+                  db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
+                  res.status(200).send('Stopped');
+                } else {
+                  db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
+                  res.status(500).send('Failed to assign IP');
+                }
+              })
             } else {
-              res.status(500).send('Could not create instance');
+              db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
+              res.status(500).send('Failed to assign IP');
             }
           })
         } else {
-          res.status(500).send('IP Unavailable')
+          res.status(500).send('Could not create instance');
         }
       })
+    } else {
+      res.status(500).send('IP unavailable! Contact IT Services')
     }
   })
 
@@ -200,4 +183,33 @@ function authenticationMiddleware() {
   }
 }
 
+router.get('/stopped/:instanceId', function (req, res) {
+  isInstanceStopped(req.params.instanceId).then((stopped) => {
+    res.send(stopped);
+  })
+})
+function isInstanceStopped(instanceId) {
+  return new Promise((resolve, reject) => {
+    var count = 5;
+    var timer = setInterval(() => {
+      if (count <= 0) {
+        clearInterval(timer);
+        reject(false);
+      }
+      console.log(new Date())
+      rds.getInstanceStatus(instanceId).then(status => {
+        count = count - 1;
+        console.log(`${count} INFO isInstanceStopped: ${status}`);
+        if (status && status == "Stopped") {
+          clearInterval(timer);
+          resolve(true)
+        }
+      });
+    }, 4000);
+  }).catch(err => {
+    console.error(`ERROR isInstanceStopped: ${err}`)
+    return 'tatti';
+  })
+
+}
 module.exports = router;

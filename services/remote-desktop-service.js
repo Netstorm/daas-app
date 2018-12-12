@@ -146,7 +146,7 @@ function getAvailableEipAddresses() {
 	});
 }
 
-const associateEipAddress = async (instanceId, allocationId) => {
+const bindIpAddress = async (instanceId, allocationId) => {
 	try {
 		var params = {
 			RegionId: process.env.REGION_ID,
@@ -155,16 +155,16 @@ const associateEipAddress = async (instanceId, allocationId) => {
 		}
 		var result = await client.request('AssociateEipAddress', params);
 		if (result && result.RequestId) {
-			console.log(`associateEipAddress: ${JSON.stringify(result)}`);
+			console.log(`bindIpAddress: ${JSON.stringify(result)}`);
 			return result;
 		}
 	} catch (err) {
-		console.error(`associateEipAddress: ${err}`);
+		console.error(`bindIpAddress: ${err}`);
 		return false;
 	}
 }
 
-const unassociateEipAddress = async (instanceId, allocationId) => {
+const unbindIpAddress = async (instanceId, allocationId) => {
 	try {
 		var params = {
 			AllocationId: allocationId,
@@ -172,11 +172,11 @@ const unassociateEipAddress = async (instanceId, allocationId) => {
 		}
 		var result = await client.request('UnassociateEipAddress', params);
 		if (result && result.RequestId) {
-			console.log(`associateEipAddress: ${JSON.stringify(result)}`);
+			console.log(`unbindIpAddress: ${JSON.stringify(result)}`);
 			return result;
 		}
 	} catch (err) {
-		console.error(`associateEipAddress: ${err}`);
+		console.error(`unbindIpAddress: ${err}`);
 		return false;
 	}
 }
@@ -199,5 +199,5 @@ const releaseEipAddress = async (allocationId) => {
 
 module.exports = {
 	describeInstances, getInstanceStatus, startInstance, stopInstance, createInstance,
-	deleteInstance, allocateEipAddress, associateEipAddress, unassociateEipAddress, releaseEipAddress, getAvailableEipAddresses
+	deleteInstance, allocateEipAddress, bindIpAddress, unbindIpAddress, releaseEipAddress, getAvailableEipAddresses
 };

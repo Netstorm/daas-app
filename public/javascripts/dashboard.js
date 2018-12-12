@@ -58,7 +58,7 @@ $('#shutdown-btn').on('click', function (event) {
 			setTimeout(function () {
 				$('#loader').hide();
 				location.reload();
-			}, 100000);
+			}, 60000);
 		},
 		error: function (err) {
 			$('#loader').hide();
@@ -75,30 +75,14 @@ $("#create-btn").on("click", function () {
 	$('#loader').show();
 	$('#create-btn').attr("disabled", true);
 	$('#delete-btn').attr("disabled", true);
-	$('#instanceStatus').text('Launching Windows...');
-	$.ajax({
-		url: $(this).attr("data-url"),
-		success: function (response) {
-			if (response == "Stopped") {
-				$('#loader').hide();
-				location.reload();
-			} else {
-				$('#instanceStatus').text('Initializing...');
-				setTimeout(function () {
-					$('#loader').hide();
-					location.reload();
-				}, 100000)
-			}
-		},
-		error: function (err) {
-			$('#loader').hide();
-			$('#instanceStatus').text(err.responseText);
-			$('#error').text('Failed to launch, please try again');
-			$('#error').show();
-			$('#delete-btn').attr("disabled", false);
-			$('#create-btn').attr("disabled", false);
-		}
-	});
+	var instanceId = $('#instanceId').text();
+	var username = $('#username').attr("data-username");
+	if (instanceId) {
+		startInstance(username);
+	} else {
+		createInstance(username);
+	}
+
 });
 
 /** Delete Instance */
@@ -134,3 +118,59 @@ $("#delete-btn").on("click", function () {
 		});
 	}, 25000);
 });
+
+function startInstance(username) {
+	$('#instanceStatus').text('Requesting start');
+	$.ajax({
+		url: `/users/${username}/startInstance`,
+		method: 'PUT',
+		success: function (response) {
+			if (response == "Running") {
+				$('#instanceStatus').text('Starting Windows...');
+				setTimeout(function () {
+					$('#loader').hide();
+					location.reload();
+				}, 60000)
+			} else {
+				$('#instanceStatus').text(response);
+				$('#loader').hide();
+			}
+		},
+		error: function (err) {
+			$('#loader').hide();
+			$('#instanceStatus').text('Failed');
+			$('#error').text(err.responseText);
+			$('#error').show();
+			$('#delete-btn').attr("disabled", false);
+			$('#create-btn').attr("disabled", false);
+		}
+	});
+}
+
+function createInstance(username) {
+	$('#instanceStatus').text('Creating new Windows PC...');
+	return $.ajax({
+		url: `/users/${username}/createInstance`,
+		method: 'POST',
+		success: function (response) {
+			if (response == "Stopped") {
+				$('#instanceStatus').text('Created');
+				startInstance(username);
+			} else {
+				$('#instanceStatus').text(response);
+				setTimeout(function () {
+					$('#loader').hide();
+					location.reload();
+				}, 10000)
+			}
+		},
+		error: function (err) {
+			$('#loader').hide();
+			$('#instanceStatus').text('Failed');
+			$('#error').text(err.responseText);
+			$('#error').show();
+			$('#delete-btn').attr("disabled", false);
+			$('#create-btn').attr("disabled", false);
+		}
+	});
+}

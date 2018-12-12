@@ -116,7 +116,7 @@ router.put('/bindip', function (req, res) {
 	rds.getAvailableEipAddresses().then(ipaddresses => {
 		var ip = ipaddresses[0].IpAddress;
 		var allocationId = ipaddresses[0].AllocationId;
-		rds.associateEipAddress(req.body.instanceId, allocationId).then(() => {
+		rds.bindIpAddress(req.body.instanceId, allocationId).then(() => {
 			db.updateIp(ip, allocationId, req.body.username).then(() => {
 				res.json({ instanceIp: ip, binded: true });
 			});
@@ -130,7 +130,7 @@ router.put('/bindip', function (req, res) {
 /** Unbind Elastic IP */
 router.put('/unbindip', function (req, res) {
 	db.getIpDetails(req.body.username).then(result => {
-		rds.unassociateEipAddress(req.body.instanceId, result[0].ipAllocationId).then(() => {
+		rds.unbindIpAddress(req.body.instanceId, result[0].ipAllocationId).then(() => {
 			db.updateIp(null, null, req.body.username).then(() => {
 				res.json({ unbinded: true });
 			});
