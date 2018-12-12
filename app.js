@@ -17,10 +17,10 @@ var adminRouter = require('./routes/admin');
 require('dotenv').config();
 
 // HTTPS options
-// var httpsOptions = {
-//   pfx: fs.readFileSync(process.env.CERT_PATH),
-//   passphrase: process.env.CERT_PASSPHRASE
-// };
+var httpsOptions = {
+  pfx: fs.readFileSync(process.env.CERT_PATH),
+  passphrase: process.env.CERT_PASSPHRASE
+};
 
 var app = express();
 
@@ -82,15 +82,15 @@ app.use(function (err, req, res, next) {
   
 });
 
-// app.use('*', function (req, res, next) {
-//   if (!req.secure && process.env.NODE_ENV == 'production') {
-//     var secureUrl = "https://" + req.headers['host'] + req.url;
-//     res.writeHead(301, { "Location": secureUrl });
-//     res.end();
-//   }
-//   next();
-// });
+app.use('*', function (req, res, next) {
+  if (!req.secure && process.env.NODE_ENV == 'production') {
+    var secureUrl = "https://" + req.headers['host'] + req.url;
+    res.writeHead(301, { "Location": secureUrl });
+    res.end();
+  }
+  next();
+});
 
-// https.createServer(httpsOptions, app).listen(3001);
+https.createServer(httpsOptions, app).listen(3001);
 
 module.exports = app;
