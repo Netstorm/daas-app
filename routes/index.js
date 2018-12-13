@@ -19,7 +19,7 @@ const url = require('url');
  */
 router.get('/', (req, res, next) => {
 	if (req.isAuthenticated()) {
-		res.redirect(`/users/${req.user}`);
+		return res.redirect(`/users/${req.user}`);
 	}
 	else {
 		res.render('index', { page: 'MyDesktop', menuId: 'home', errors: null });
@@ -51,7 +51,7 @@ router.post('/login',
 						ad.user(req.body.username).authenticate(req.body.password).then(result => {
 							if (result) {
 								req.login(req.body.username, function (err) {
-									res.redirect(url.format({
+									return res.redirect(url.format({
 										pathname: `users/${req.body.username}`,
 										query: { name: name }
 									}));
@@ -73,7 +73,7 @@ router.post('/login',
 router.get('/logout', function (req, res, next) {
 	req.logout();
 	req.session.destroy();
-	res.redirect('/');
+	return res.redirect('/');
 });
 
 router.post('/logintest', function (req, res) {
