@@ -84,7 +84,7 @@ app.use(function (err, req, res, next) {
 
 app.use('*', function (req, res, next) {
   if (!req.secure && process.env.NODE_ENV == 'production') {
-    var secureUrl = "https://" + req.headers['host'] + req.url;
+    var secureUrl = "https://mydesktop.mhs.amidata.com.au:3001" + req.url;
     res.writeHead(301, { "Location": secureUrl });
     res.end();
   }
