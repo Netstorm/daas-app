@@ -62,8 +62,7 @@ router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), fu
   })
 })
 
-router.get('/:username/:instanceId/stopIdleInstance', authenticationMiddleware(), function (req, res, next) {
-  console.log('Idle username: ', req.params.username);
+router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
   console.log('Idle instanceId: ', req.params.instanceId);
   rds.stopInstance(req.params.instanceId).then(result => {
     if (result && result.RequestId) {

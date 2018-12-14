@@ -1,7 +1,8 @@
 module.exports = {
 	userdata: `[powershell]
 	Set-ExecutionPolicy unrestricted -Force
-	New-Item C:\\temp -ItemType Directory -Force
+  $tempDir = New-Item C:\\temp -ItemType Directory -Force
+  $tempDir.attributes="Hidden"
 	$instanceId = "null"
 	while ($instanceId -NotLike "i-*") {
 	 	Start-Sleep -s 3
@@ -19,6 +20,8 @@ module.exports = {
 	$interfaceIndex = (Get-NetAdapter | Where-object {$_.Name -like "*Ethernet*" } | Select-Object -ExpandProperty InterfaceIndex)
   Log-Write "INFO InterfaceIndex=$interfaceIndex Setting DNS"
   Set-DnsClientServerAddress -InterfaceIndex $interfaceIndex -ServerAddresses "${process.env.DC_PRIMARY_DNS}","${process.env.DC_SECONDARY_DNS}"
+  Log-Write "INFO Mapping network drive"
+  New-SmbMapping -LocalPath Z: -RemotePath \\17cc2a48158-kfw39.ap-southeast-2.nas.aliyuncs.com\myshare -Persistent:$True
   $domain = "${process.env.DOMAIN}"
 	$adminUser = "${process.env.NETBIOS}\\Administrator"
 	$adminPass = "${process.env.AD_ADMIN_PASS}" | ConvertTo-SecureString -AsPlainText -Force
