@@ -64,17 +64,18 @@ router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), fu
 
 router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
   console.log('Idle instanceId: ', req.params.instanceId);
-  rds.stopInstance(req.params.instanceId).then(result => {
-    if (result && result.RequestId) {
-      var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-      calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
-        db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
-      })
-      res.status(200).send();
-    } else {
-      res.status(500).send();
-    }
-  })
+  // rds.stopInstance(req.params.instanceId).then(result => {
+  //   if (result && result.RequestId) {
+  //     var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+  //     calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
+  //       db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
+  //     })
+  //     res.status(200).send();
+  //   } else {
+  //     res.status(500).send();
+  //   }
+  // })
+  res.send('OK');
 })
 
 router.get('/:username/getInstanceStatus', function (req, res, next) {

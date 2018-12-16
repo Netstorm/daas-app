@@ -1,8 +1,10 @@
 var https = require('https');
 var fs = require('fs');
+const redirectToHttps = require('https-rewrite/express');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
@@ -24,6 +26,7 @@ var httpsOptions = {
 
 var app = express();
 
+// app.use(redirectToHttps({ status: 301 }));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -56,6 +59,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
 
 app.use(function (req, res, next) {
   res.locals.isAuthenticated = req.isAuthenticated();
@@ -79,18 +83,18 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
-  
+
 });
 
 // app.use('*', function (req, res, next) {
 //   if (!req.secure && process.env.NODE_ENV == 'production') {
-//     var secureUrl = "https://mydesktop.mhs.amidata.com.au:3001" + req.url;
+//     var secureUrl = "https://mydesktopmhs.amidata.com.au:3001" + req.url;
 //     res.writeHead(301, { "Location": secureUrl });
 //     res.end();
 //   }
 //   next();
 // });
 
-https.createServer(httpsOptions, app).listen(3001);
+https.createServer(httpsOptions, app).listen(443);
 
 module.exports = app;
