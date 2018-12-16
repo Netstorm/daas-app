@@ -61,16 +61,6 @@ app.use(function (req, res, next) {
   res.locals.isAuthenticated = req.isAuthenticated();
   next();
 });
-
-app.use('*', function (req, res, next) {
-  if (!req.secure && process.env.NODE_ENV == 'production') {
-    var secureUrl = "https://mydesktopmhs.amidata.com.au:3001" + req.url;
-    res.writeHead(301, { "Location": secureUrl });
-    res.end();
-  }
-  next();
-});
-
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
@@ -90,6 +80,15 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
   
+});
+
+app.use('*', function (req, res, next) {
+  if (!req.secure && process.env.NODE_ENV == 'production') {
+    var secureUrl = "https://mydesktop.mhs.amidata.com.au:3001" + req.url;
+    res.writeHead(301, { "Location": secureUrl });
+    res.end();
+  }
+  next();
 });
 
 https.createServer(httpsOptions, app).listen(3001);
