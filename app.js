@@ -82,14 +82,14 @@ app.use(function (err, req, res, next) {
   
 });
 
-app.use('*', function (req, res, next) {
-  if (!req.secure && process.env.NODE_ENV == 'production') {
-    var secureUrl = "https://mydesktop.mhs.amidata.com.au:3001" + req.url;
-    res.writeHead(301, { "Location": secureUrl });
-    res.end();
-  }
-  next();
-});
+// app.use('*', function (req, res, next) {
+//   if (!req.secure && process.env.NODE_ENV == 'production') {
+//     var secureUrl = "https://mydesktop.mhs.amidata.com.au:3001" + req.url;
+//     res.writeHead(301, { "Location": secureUrl });
+//     res.end();
+//   }
+//   next();
+// });
 
 https.createServer(httpsOptions, app).listen(3001);
 
