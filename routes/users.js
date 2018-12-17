@@ -49,33 +49,41 @@ router.put('/:username/startInstance', authenticationMiddleware(), function (req
 })
 
 router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), function (req, res, next) {
-  rds.stopInstance(req.params.instanceId).then(result => {
-    if (result && result.RequestId) {
-      var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-      calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
-        db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
-      })
+  rds.getInstanceStatus(req.params.instanceId).then(instanceStatus => {
+    if (instanceStatus == 'Stopped') {
       res.status(200).send();
     } else {
-      res.status(500).send();
+      rds.stopInstance(req.params.instanceId).then(result => {
+        if (result && result.RequestId) {
+          var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+          calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
+            db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
+          })
+          res.status(200).send();
+        } else {
+          res.status(500).send();
+        }
+      })
     }
   })
 })
 
 router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
-  console.log('Idle instanceId: ', req.params.instanceId);
-  // rds.stopInstance(req.params.instanceId).then(result => {
-  //   if (result && result.RequestId) {
-  //     var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-  //     calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
-  //       db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
-  //     })
-  //     res.status(200).send();
-  //   } else {
-  //     res.status(500).send();
-  //   }
-  // })
-  res.send('OK');
+  console.log(`Idle instanceId: ${req.params.instanceId}`);
+  db.getUsername(req.params.instanceId).then(result => {
+    if (result && result.length > 0) {
+      var username = result[0].username;
+      rds.stopInstance(req.params.instanceId).then(result => {
+        if (result && result.RequestId) {
+          var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+          calculateUsage(lastStopTime, username).then(usageInSeconds => {
+            db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
+          })
+        }
+      })
+    }
+    res.status(200).send();
+  })
 })
 
 router.get('/:username/getInstanceStatus', function (req, res, next) {
@@ -183,11 +191,12 @@ function authenticationMiddleware() {
   }
 }
 
-router.get('/stopped/:instanceId', function (req, res) {
-  isInstanceStopped(req.params.instanceId).then((stopped) => {
-    res.send(stopped);
-  })
-})
+// router.get('/stopped/:instanceId', function (req, res) {
+//   db.getUsername(req.params.instanceId).then(result => {
+//     res.send(result);
+//   })
+// })
+
 function isInstanceStopped(instanceId) {
   return new Promise((resolve, reject) => {
     var count = 5;

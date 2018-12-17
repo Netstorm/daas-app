@@ -121,6 +121,19 @@ function getInstanceId(username) {
 	});
 }
 
+function getUsername(instanceId) {
+	return new Promise((resolve, reject) => {
+		connection.query({ sql: 'SELECT `username` FROM `users` WHERE `instanceId`=(?)', values: [instanceId] },
+			function (error, results, fields) {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
 function saveUser(username, name) {
 	return new Promise((resolve, reject) => {
 		connection.query({ sql: 'INSERT INTO `users` (username, name) VALUES (?,?)', values: [username, name] },
@@ -248,15 +261,12 @@ function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, insta
 			} else {
 				resolve(results);
 			}
-		}).catch(err => {
-			console.log(`saveInstanceDetailsAndUsage: ${err}`);
-			resolve(false);
-		});
+		})
 	})
 }
 
 module.exports = {
 	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists, updateInstanceStatus,
 	updateStatusAndUsage, assignInstance, updateIp, getIpDetails, saveInstanceDetails, updateOnDeleteInstance,
-	updateStatusAndStartTime, getLastStartTimeAndUsage, saveInstanceDetailsAndUsage, getInstanceId
+	updateStatusAndStartTime, getLastStartTimeAndUsage, saveInstanceDetailsAndUsage, getInstanceId, getUsername
 };
