@@ -5,15 +5,10 @@ $(document).ready(function () {
 	var instanceId = $('#instanceId').text();
 	if (!instanceId) {
 		$('#create-btn').attr("disabled", false);
-		$('#delete-btn').attr("disabled", true);
-		$('#shutdown-btn').attr("disabled", true);
-	}
-	if (status == 'Stopped') {
 		$('#shutdown-btn').attr("disabled", true);
 	}
 	if (status == 'Running') {
 		$('#create-btn').attr("disabled", true);
-		$('#delete-btn').attr("disabled", true);
 	}
 });
 
@@ -30,8 +25,8 @@ $('#shutdown-btn').on('click', function (event) {
 			$('#error').hide();
 			setTimeout(function () {
 				$('#loader').hide();
-				location.reload();
-			}, 60000);
+				deleteInstance();
+			}, 40000);
 		},
 		error: function (err) {
 			$('#loader').hide();
@@ -60,38 +55,34 @@ $("#create-btn").on("click", function () {
 });
 
 /** Delete Instance */
-$("#delete-btn").on("click", function () {
-	event.preventDefault();
-	event.stopPropagation();
-	$('#loader').show();
-	$('#delete-btn').attr("disabled", true);
+function deleteInstance() {
 	$('#instanceStatus').text('Deleting...');
-	var url = $(this).attr("data-url");
-	setTimeout(function () {
-		var instanceId = $('#instanceId').text();
-		var ipAllocationId = $('#ipAllocationId').text();
-		$.ajax({
-			url: url,
-			method: 'POST',
-			data: {
-				instanceId: instanceId,
-				ipAllocationId: ipAllocationId
-			},
-			success: function (response) {
-				console.log(response);
+	var username = $('#username').attr("data-username");
+	var instanceId = $('#instanceId').text();
+	var ipAllocationId = $('#ipAllocationId').text();
+	var url = `/users/${username}/deleteInstance`;
+	$.ajax({
+		url: url,
+		method: 'POST',
+		data: {
+			instanceId: instanceId,
+			ipAllocationId: ipAllocationId
+		},
+		success: function (response) {
+			setTimeout(function () {
 				$('#loader').hide();
 				location.reload();
-			},
-			error: function (err) {
-				$('#loader').hide();
-				$('#instanceStatus').text(err.responseText);
-				$('#error').text('Failed to delete, please try again');
-				$('#error').show();
-				$('#delete-btn').attr("disabled", false);
-			}
-		});
-	}, 25000);
-});
+			}, 20000);
+		},
+		error: function (err) {
+			$('#loader').hide();
+			$('#instanceStatus').text(err.responseText);
+			$('#error').text('Failed to delete, please try again');
+			$('#error').show();
+			$('#shutdown-btn').attr("disabled", false);
+		}
+	});
+};
 
 function startInstance(username) {
 	$('#instanceStatus').text('Requesting start');
@@ -102,9 +93,16 @@ function startInstance(username) {
 			if (response == "Running") {
 				$('#instanceStatus').text('Starting Windows...');
 				setTimeout(function () {
+					$('#instanceStatus').text('Initialising, will take few minutes...');
+				}, 60000);
+				setTimeout(function () {
+					$('#instanceStatus').text('Setting up profile...');
+				}, 80000);
+				setTimeout(function () {
+					$('#instanceStatus').text('Done');
 					$('#loader').hide();
 					location.reload();
-				}, 60000)
+				}, 80000);
 			} else {
 				$('#instanceStatus').text(response);
 				$('#loader').hide();

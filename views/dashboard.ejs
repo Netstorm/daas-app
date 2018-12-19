@@ -23,9 +23,7 @@
 		<div class="col-sm-4">
 		<div class="spacer"></div>
 			<button id="create-btn" data-url="/users/<%= user.username %>/createInstance" type="submit" class="btn btn-primary btn-block">Launch Windows PC</button></br>
-			<!-- <button id="start-btn" data-url="/users/<%= user.username %>/<%= user.instanceId %>/startInstance" type="submit" class="btn btn-primary btn-block">Start</button></br> -->
 			<button id='shutdown-btn' data-url="/users/<%= user.username %>/<%= user.instanceId %>/stopInstance" type="submit" class="btn btn-danger btn-block">Shutdown</button></br>
-			<button id="delete-btn" data-url="/users/<%= user.username %>/deleteInstance" type="submit" class="btn btn-danger btn-block">Delete</button></br>
 		</div>
 		<div class="col-sm-4">
 			<div class="text-left well">
@@ -33,16 +31,15 @@
 				<p></p>
 				<dl>
 					<dt>Launch Windows PC</dt>
-					<dd>Starts a Windows 10 PC or creates a new one</dd>
+					<dd>Starts a remote Windows 10 PC.</dd>
+					<dd class="bg-danger"><small>NOTE: May take 3 to 5 minutes to setup.</small></dd>
 					<dt>Shutdown</dt>
-					<dd>Stops the running PC.</br><small>NOTE: Shutdown from Windows will not stop the PC. Make sure to shutdown from here.</small></dd>
-					<dt>Delete</dt>
-					<dd>Permanently deletes the PC.</br><small>NOTE: All data on the PC will be lost.</small></dd></br>
+					<dd>Stops and deletes the remote PC.</br></dd>
 					<div>
-						<dt>Connecting to the system</dt>
+						<dt>How to connect?</dt>
 						<dd>On Windows, search for Remote Desktop Connection on the Start Menu. Enter the Desktop IP, username (as <mark>'MHSVDI\username'</mark>) and password. Save & Connect</dd></br>
 						<dd>On Mac, install Microsoft Remote Desktop 10. Add a new connection with the Desktop IP, username (as <mark>'MHSVDI\username'</mark>) and password. Save & Connect</dd>
-						<dd class="bg-danger"><small>NOTE: A new PC takes about 3 to 5 mins to register with the domain.</small></dd>
+						
 					</div>
 				</dl>
 			</div>

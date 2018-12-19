@@ -6,7 +6,7 @@
     "start": "node -r dotenv/config ./bin/www"
   },
   "dependencies": {
-    "@alicloud/pop-core": "^1.7.1",
+    "@alicloud/pop-core": "^1.7.4",
     "ad": "^0.3.2",
     "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.3",
@@ -19,13 +19,13 @@
     "http-errors": "~1.6.2",
     "https-rewrite": "^1.0.1",
     "lodash": "^4.17.11",
-    "moment": "^2.22.2",
+    "moment": "^2.23.0",
     "morgan": "~1.9.0",
     "mysql": "^2.16.0",
     "passport": "^0.4.0",
     "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
-    "dotenv": "^6.1.0"
+    "dotenv": "^6.2.0"
   }
 }
