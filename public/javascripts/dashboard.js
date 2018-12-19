@@ -18,13 +18,13 @@ $('#shutdown-btn').on('click', function (event) {
 	event.stopPropagation();
 	$('#shutdown-btn').attr("disabled", true);
 	$('#loader').show();
+	var status = $('#instanceStatus').text();
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
 			$('#instanceStatus').text('Shutting Down...');
 			$('#error').hide();
 			setTimeout(function () {
-				$('#loader').hide();
 				deleteInstance();
 			}, 40000);
 		},
@@ -91,18 +91,18 @@ function startInstance(username) {
 		method: 'PUT',
 		success: function (response) {
 			if (response == "Running") {
-				$('#instanceStatus').text('Starting Windows...');
+				$('#instanceStatus').text('Starting Windows, 4 minutes remaining...');
 				setTimeout(function () {
-					$('#instanceStatus').text('Initialising, will take few minutes...');
+					$('#instanceStatus').text('Initialising, 3 minutes remaining...');
 				}, 60000);
 				setTimeout(function () {
-					$('#instanceStatus').text('Setting up profile...');
-				}, 80000);
+					$('#instanceStatus').text('Just a moment, setting up profile...');
+				}, 90000);
 				setTimeout(function () {
 					$('#instanceStatus').text('Done');
 					$('#loader').hide();
 					location.reload();
-				}, 80000);
+				}, 90000);
 			} else {
 				$('#instanceStatus').text(response);
 				$('#loader').hide();
