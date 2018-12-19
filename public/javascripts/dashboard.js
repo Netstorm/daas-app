@@ -93,16 +93,15 @@ function startInstance(username) {
 				$('#instanceStatus').text('Starting Windows, 4 minutes to go...');
 				setTimeout(function () {
 					$('#instanceStatus').text('Initialising, 3 minutes remaining...');
-				}, 60000);
-				setTimeout(function () {
-					$('#instanceStatus').text('Just a moment, setting up profile...');
 					setTimeout(function () {
-						$('#instanceStatus').text('Done');
-						$('#loader').hide();
-						location.reload();
+						$('#instanceStatus').text('Just a moment, setting up profile...');
+						setTimeout(function () {
+							$('#instanceStatus').text('Done');
+							$('#loader').hide();
+							location.reload();
+						}, 90000);
 					}, 90000);
-				}, 90000);
-
+				}, 60000);
 			} else {
 				$('#instanceStatus').text(response);
 				$('#loader').hide();
