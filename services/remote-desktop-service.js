@@ -44,10 +44,11 @@ const getInstanceStatus = async (instanceId) => {
 
 const startInstance = async (instanceId) => {
 	try {
-		console.log('StartInstance: ', instanceId);
 		var result = await client.request('StartInstance', { 'InstanceId': instanceId });
-		console.log(`startInstance: ${JSON.stringify(result)}`);
-		return result;
+		if (result && result.RequestId) {
+			console.log(`startInstance: success`);
+			return result;
+		}
 	} catch (err) {
 		console.log('startInstance: ', err);
 	}
@@ -56,8 +57,10 @@ const startInstance = async (instanceId) => {
 const stopInstance = async (instanceId) => {
 	try {
 		var result = await client.request('StopInstance', { 'InstanceId': instanceId });
-		console.log(`stopInstance: ${JSON.stringify(result)}`);
-		return result;
+		if (result && result.RequestId) {
+			console.log(`stopInstance: success`);
+			return result;
+		}
 	} catch (err) {
 		console.log('stopInstance: ', err);
 	}
@@ -95,7 +98,7 @@ function deleteInstance(instanceId) {
 	return new Promise((resolve, reject) => {
 		client.request('DeleteInstance', { 'InstanceId': instanceId }).then((result) => {
 			if (result && result.RequestId) {
-				console.log(`deleteInstance: ${JSON.stringify(result)}`);
+				console.log(`deleteInstance: success`);
 				resolve(true);
 			}
 			else {
@@ -155,7 +158,7 @@ const bindIpAddress = async (instanceId, allocationId) => {
 		}
 		var result = await client.request('AssociateEipAddress', params);
 		if (result && result.RequestId) {
-			console.log(`bindIpAddress: ${JSON.stringify(result)}`);
+			console.log(`bindIpAddress: IP Binded`);
 			return result;
 		}
 	} catch (err) {
@@ -172,7 +175,7 @@ const unbindIpAddress = async (instanceId, allocationId) => {
 		}
 		var result = await client.request('UnassociateEipAddress', params);
 		if (result && result.RequestId) {
-			console.log(`unbindIpAddress: ${JSON.stringify(result)}`);
+			console.log(`unbindIpAddress: IP Unbinded`);
 			return result;
 		}
 	} catch (err) {

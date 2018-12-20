@@ -51,7 +51,7 @@ router.put('/:username/startInstance', authenticationMiddleware(), function (req
 router.get('/:username/:instanceId/stopInstance', function (req, res, next) {
   rds.getInstanceStatus(req.params.instanceId).then(instanceStatus => {
     if (instanceStatus == 'Stopped') {
-      res.status(200).send();
+      res.status(200).send('Stopped');
     } else {
       rds.stopInstance(req.params.instanceId).then(result => {
         if (result && result.RequestId) {
@@ -69,7 +69,8 @@ router.get('/:username/:instanceId/stopInstance', function (req, res, next) {
 })
 
 router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
-  console.log(`Idle instanceId: ${req.params.instanceId}`);
+  var timestamp = moment().toLocaleString();
+  console.log(`Idle instanceId: ${req.params.instanceId} ${timestamp}`);
   db.getUsername(req.params.instanceId).then(result => {
     if (result && result.length > 0) {
       var username = result[0].username;
@@ -141,10 +142,8 @@ router.post('/:username/createInstance', authenticationMiddleware(), function (r
 
 /** Delete Instance */
 router.post('/:username/deleteInstance', function (req, res, next) {
-  var instanceStatus;
-  rds.getInstanceStatus(req.body.instanceId).then(status => {
-    instanceStatus = status;
-    if (status == 'Stopped') {
+  isInstanceStopped(req.body.instanceId).then(stopped => {
+    if (stopped) {
       rds.deleteInstance(req.body.instanceId).then(result => {
         if (result) {
           db.updateOnDeleteInstance(null, null, null, null, req.params.username);
@@ -154,8 +153,7 @@ router.post('/:username/deleteInstance', function (req, res, next) {
         }
       })
     } else {
-      db.updateInstanceStatus(instanceStatus, req.params.username);
-      res.status(500).send(instanceStatus);
+      res.status(500).send('Incorrect instance state');
     }
   })
 })
@@ -205,10 +203,9 @@ function isInstanceStopped(instanceId) {
         clearInterval(timer);
         reject(false);
       }
-      console.log(new Date())
       rds.getInstanceStatus(instanceId).then(status => {
         count = count - 1;
-        console.log(`${count} INFO isInstanceStopped: ${status}`);
+        console.log(`isInstanceStopped: count=${count}`);
         if (status && status == "Stopped") {
           clearInterval(timer);
           resolve(true)
@@ -216,8 +213,8 @@ function isInstanceStopped(instanceId) {
       });
     }, 4000);
   }).catch(err => {
-    console.error(`ERROR isInstanceStopped: ${err}`)
-    return 'tatti';
+    console.error(`isInstanceStopped: ${err}`)
+    return false;
   })
 
 }

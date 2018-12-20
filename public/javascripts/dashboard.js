@@ -18,14 +18,18 @@ $('#shutdown-btn').on('click', function (event) {
 	event.stopPropagation();
 	$('#shutdown-btn').attr("disabled", true);
 	$('#loader').show();
+	var instanceId = $('#instanceId').text();
 	$.ajax({
 		url: $(this).attr("data-url"),
 		success: function (response) {
-			$('#instanceStatus').text('Shutting Down...');
-			$('#error').hide();
-			setTimeout(function () {
-				deleteInstance();
-			}, 40000);
+			if (response == 'Stopped') {
+				deleteInstance(instanceId);
+			} else {
+				$('#instanceStatus').text('Shutting Down...');
+				setTimeout(function () {
+					deleteInstance(instanceId);
+				}, 40000);
+			}
 		},
 		error: function (err) {
 			$('#loader').hide();
@@ -54,18 +58,15 @@ $("#create-btn").on("click", function () {
 });
 
 /** Delete Instance */
-function deleteInstance() {
+function deleteInstance(instanceId) {
 	$('#instanceStatus').text('Deleting...');
 	var username = $('#username').attr("data-username");
-	var instanceId = $('#instanceId').text();
-	var ipAllocationId = $('#ipAllocationId').text();
 	var url = `/users/${username}/deleteInstance`;
 	$.ajax({
 		url: url,
 		method: 'POST',
 		data: {
-			instanceId: instanceId,
-			ipAllocationId: ipAllocationId
+			instanceId: instanceId
 		},
 		success: function (response) {
 			setTimeout(function () {
