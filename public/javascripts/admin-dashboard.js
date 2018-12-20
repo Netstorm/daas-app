@@ -14,6 +14,7 @@ $(document).ready(function () {
   $(".status").each(function () {
     if ($(this).text() !== 'Stopped') {
       $(this).closest("tr").find("[id^=release]").attr("disabled", true);
+      $(this).closest("tr").find("[id^=unbind]").attr("disabled", true);
     }
     if ($(this).text() == 'Stopped') {
       $(this).closest("tr").find("[id^=stop]").attr("disabled", true);
