@@ -82,7 +82,7 @@ router.post('/releaseInstance', function (req, res, next) {
 	var dbUpdated = false;
 	rds.deleteInstance(req.body.instanceId).then(result => {
 		released = true;
-		db.updateUser(null, null, req.body.username).then(() => {
+		db.updateOnDeleteInstance(null, null, null, null, req.body.username).then(() => {
 			dbUpdated = true;
 			res.json({
 				released: released,
