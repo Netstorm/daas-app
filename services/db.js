@@ -50,7 +50,7 @@ function updateUser(instanceId, instanceIP, username) {
 	});
 }
 
-function assignInstance(instanceId, instanceStatus, username) {
+function saveInstanceIdandStatus(instanceId, instanceStatus, username) {
 	return new Promise((resolve, reject) => {
 		connection.query({
 			sql: 'UPDATE `users` SET `instanceId` = (?), `instanceStatus` = (?)	WHERE `username` = (?)',
@@ -267,6 +267,6 @@ function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, insta
 
 module.exports = {
 	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists, updateInstanceStatus,
-	updateStatusAndUsage, assignInstance, updateIp, getIpDetails, saveInstanceDetails, updateOnDeleteInstance,
+	updateStatusAndUsage, saveInstanceIdandStatus, updateIp, getIpDetails, saveInstanceDetails, updateOnDeleteInstance,
 	updateStatusAndStartTime, getLastStartTimeAndUsage, saveInstanceDetailsAndUsage, getInstanceId, getUsername
 };

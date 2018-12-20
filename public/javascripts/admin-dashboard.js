@@ -9,6 +9,7 @@ $(document).ready(function () {
     else {
       $(this).closest("tr").find("[id^=release]").attr("disabled", true);
       $(this).closest("tr").find("[id^=stop]").attr("disabled", true);
+      $(this).closest("tr").find("[id^=bind]").attr("disabled", true);
     }
   });
   $(".status").each(function () {

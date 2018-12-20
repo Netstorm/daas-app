@@ -64,15 +64,17 @@ router.post('/createInstance', function (req, res, next) {
 	var instanceId = '';
 	var instanceIP = null;
 	rds.createInstance(req.body.username).then(result => {
-		console.log(`Username: ${req.body.username}`);
-		console.log(`Instance created: ${result}`);
-		instanceId = result.InstanceId;
-		db.assignInstance(instanceId, 'Stopped', req.body.username).then(() => {
-			res.json({
-				instanceId: instanceId,
-				created: true
+		if (result) {
+			instanceId = result.InstanceId;
+			db.saveInstanceIdandStatus(instanceId, 'Stopped', req.body.username).then(() => {
+				res.json({
+					instanceId: instanceId,
+					created: true
+				});
 			});
-		});
+		} else {
+			res.status(500).send('Failed to create instance')
+		}
 	});
 });
 
