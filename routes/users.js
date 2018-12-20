@@ -48,7 +48,7 @@ router.put('/:username/startInstance', authenticationMiddleware(), function (req
   })
 })
 
-router.get('/:username/:instanceId/stopInstance', authenticationMiddleware(), function (req, res, next) {
+router.get('/:username/:instanceId/stopInstance', function (req, res, next) {
   rds.getInstanceStatus(req.params.instanceId).then(instanceStatus => {
     if (instanceStatus == 'Stopped') {
       res.status(200).send();
@@ -140,7 +140,7 @@ router.post('/:username/createInstance', authenticationMiddleware(), function (r
 })
 
 /** Delete Instance */
-router.post('/:username/deleteInstance', authenticationMiddleware(), function (req, res, next) {
+router.post('/:username/deleteInstance', function (req, res, next) {
   var instanceStatus;
   rds.getInstanceStatus(req.body.instanceId).then(status => {
     instanceStatus = status;

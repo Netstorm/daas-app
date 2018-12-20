@@ -11,6 +11,7 @@
 </br>
 	<div class="container">
 			<div class="col-sm-6">
+				<div class="alert alert-danger" id="error"></div>
 				<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
 			</div>
 			<div class="col-sm-6">
@@ -26,7 +27,7 @@
 				<th>Instance Status</th>
 				<th>Total Usage</th>
 				<th>Create Instance</th>
-				<th>Release Instance</th>
+				<th>Stop/Release Instance</th>
 			</tr>
 
 			<% for (var i = 0; i < vdiusers.length; i++) { %>
@@ -53,7 +54,10 @@
 					<button id='create-btn-<%= i %>' type="submit" class="btn btn-info btn-sm create-btn">Create Instance</button>
 				</td>
 				<td>
-					<button id='release-btn-<%= i %>' data-url="/admin/releaseInstance" type="submit" class="btn btn-danger btn-sm release-btn">Release Instance</button>
+					<div class="btn-group">
+						<button id='stop-btn-<%= i %>' data-url="/admin/stopInstance" type="submit" class="btn btn-danger btn-sm stop-btn">Stop</button>
+						<button id='release-btn-<%= i %>' data-url="/admin/releaseInstance" type="submit" class="btn btn-danger btn-sm release-btn">Release</button>
+					</div>
 				</td>
 			</tr>
 			<% } %>

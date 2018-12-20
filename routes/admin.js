@@ -76,41 +76,6 @@ router.post('/createInstance', function (req, res, next) {
 	});
 });
 
-/** ReleaseInstance */
-router.post('/releaseInstance', function (req, res, next) {
-	var released = false;
-	var dbUpdated = false;
-	rds.deleteInstance(req.body.instanceId).then(result => {
-		released = true;
-		db.updateOnDeleteInstance(null, null, null, null, req.body.username).then(() => {
-			dbUpdated = true;
-			res.json({
-				released: released,
-				dbUpdated: dbUpdated
-			});
-		});
-	});
-});
-
-// router.get('/loadUsers', function (req, res) {
-// 	ad.user().get().then(users => {
-// 		var vdiusers = _.filter(users, _.flow(
-// 			_.property('groups'),
-// 			_.partialRight(_.some, { cn: process.env.STUDENT_GROUP })
-// 		));
-// 		vdiusers.forEach(user => {
-// 			db.ifUserExists(user.sAMAccountName).then(result => {
-// 				if (!result.length) {
-// 					db.saveUser(user.sAMAccountName, user.displayName);
-// 				}
-// 			});
-// 		});
-// 		res.json({
-// 			synced: true
-// 		});
-// 	});
-// });
-
 /** Bind Elastic IP */
 router.put('/bindip', function (req, res) {
 	rds.getAvailableEipAddresses().then(ipaddresses => {
@@ -137,6 +102,25 @@ router.put('/unbindip', function (req, res) {
 		});
 	});
 });
+
+// router.get('/loadUsers', function (req, res) {
+// 	ad.user().get().then(users => {
+// 		var vdiusers = _.filter(users, _.flow(
+// 			_.property('groups'),
+// 			_.partialRight(_.some, { cn: process.env.STUDENT_GROUP })
+// 		));
+// 		vdiusers.forEach(user => {
+// 			db.ifUserExists(user.sAMAccountName).then(result => {
+// 				if (!result.length) {
+// 					db.saveUser(user.sAMAccountName, user.displayName);
+// 				}
+// 			});
+// 		});
+// 		res.json({
+// 			synced: true
+// 		});
+// 	});
+// });
 
 passport.serializeUser(function (username, done) {
 	done(null, username);
