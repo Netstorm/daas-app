@@ -9,6 +9,7 @@
     "@alicloud/pop-core": "^1.7.4",
     "ad": "^0.3.2",
     "body-parser": "^1.18.3",
+    "clipboard": "^2.0.4",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
