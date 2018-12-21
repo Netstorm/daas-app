@@ -31,3 +31,12 @@
 .bind-btn .unbind-btn {
   float: right;
 }
+.copy-btn {
+  float: right
+}
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+tr { 
+  height: 60px
+}

@@ -6,10 +6,20 @@ $(document).ready(function () {
 	if (!instanceId) {
 		$('#create-btn').attr("disabled", false);
 		$('#shutdown-btn').attr("disabled", true);
+		$('.copy-btn').attr("disabled", true);
 	}
 	if (status == 'Running') {
 		$('#create-btn').attr("disabled", true);
 	}
+	var clipboard = new ClipboardJS('.copy-btn', {
+		target: function () {
+			return document.querySelector('#instanceIP');
+		}
+	});
+	clipboard.on('success', function (e) {
+		setTooltip(e.trigger, 'Copied!');
+		hideTooltip(e.trigger);
+	});
 });
 
 /** Stop Instance */
@@ -145,4 +155,22 @@ function createInstance(username) {
 			$('#create-btn').attr("disabled", false);
 		}
 	});
+}
+
+// Tooltip
+$('.copy-btn').tooltip({
+	trigger: 'click',
+	placement: 'bottom'
+});
+
+function setTooltip(btn, message) {
+	$(btn).tooltip('hide')
+		.attr('data-original-title', message)
+		.tooltip('show');
+}
+
+function hideTooltip(btn) {
+	setTimeout(function () {
+		$(btn).tooltip('hide');
+	}, 1000);
 }

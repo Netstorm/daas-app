@@ -12,10 +12,16 @@
 		</br>
 			<div class="text-center" id="desktop-icon"><i class="fa fa-desktop" style="font-size:72px;color:blue"></i></div>
 			</br>
-			<table class="table text-left">	
-				<tr><td><strong>Desktop ID</td></strong><td id="instanceId"><%= user.instanceId %></td></tr>
-				<tr><td><strong>Desktop IP</td></strong><td id="<%= user.ipAllocationId %>"><%= user.instanceIP %></td></tr>
-				<tr><td><strong>Status</td></strong><td id="instanceStatus"><%= user.instanceStatus %></td></tr>
+			<table class="table">
+        <div>	
+				<tr><td><strong>Desktop ID</td></strong><td id="instanceId"><%= user.instanceId %></td><td></td></tr>
+				<tr><td><strong>Desktop IP</td></strong><td id="instanceIP" class="align-middle"><%= user.instanceIP %></td>
+					<td><button class="copy-btn btn" data-clipboard-target="instanceIP"><i class="fa fa-copy"></i></button>
+          </td></tr>
+        </div>
+				<div>
+					<tr><td><strong>Status</td></strong><td id="instanceStatus"><%= user.instanceStatus %></td><td></td></tr>
+				</div>
 			</table>
 			<div class="alert alert-danger" id="error"></div>
 			<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
@@ -32,7 +38,7 @@
 				<dl>
 					<dt>Launch Windows PC</dt>
 					<dd>Starts a remote Windows 10 PC.</dd>
-					<dd class="bg-danger"><small>NOTE: May take 3 to 5 minutes to setup.</small></dd>
+					<dd class="bg-danger"><small>NOTE: May take 4 to 5 minutes to setup.</small></dd>
 					<dt>Shutdown</dt>
 					<dd>Stops and deletes the remote PC.</br></dd>
 					<div>
