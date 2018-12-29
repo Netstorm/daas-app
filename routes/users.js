@@ -89,6 +89,15 @@ router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
           var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
           calculateUsage(lastStopTime, username).then(usageInSeconds => {
             db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
+            isInstanceStopped(req.body.instanceId).then(stopped => {
+              if (stopped) {
+                rds.deleteInstance(req.body.instanceId).then(result => {
+                  if (result) {
+                    db.updateOnDeleteInstance(null, null, null, null, req.params.username);
+                  }
+                })
+              }
+            })
           })
         }
       })

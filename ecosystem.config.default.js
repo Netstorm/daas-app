@@ -39,7 +39,7 @@ module.exports = {
         IMAGE_ID: "",
         INSTANCE_TYPE: "",
         INSTANCE_CHARGE_TYPE: "",
-        PERIOD: ,
+        PERIOD: "",
         VSWITCH_ID: "",
         SECURITY_GROUP_ID: ""
 
