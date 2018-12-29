@@ -15,7 +15,17 @@ var moment = require('moment');
 router.get('/:username', authenticationMiddleware(), function (req, res, next) {
   db.getUser(req.params.username).then((results) => {
     if (results.length > 0) {
-      res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
+      if (results[0].instanceId) {
+        rds.getInstanceStatus(results[0].instanceId).then(status => {
+          db.updateInstanceStatus(status).then(() => {
+            db.getUser(req.params.username).then((results) => {
+              res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
+            });
+          })
+        })
+      } else {
+        res.render('dashboard', { page: 'MyDesktop', menuId: 'dashboard', user: results[0] });
+      }
     } else {
       db.saveUser(req.params.username, req.query.name).then(result => {
         if (result) {
@@ -197,7 +207,7 @@ function authenticationMiddleware() {
 
 function isInstanceStopped(instanceId) {
   return new Promise((resolve, reject) => {
-    var count = 5;
+    var count = 8;
     var timer = setInterval(() => {
       if (count <= 0) {
         clearInterval(timer);
@@ -211,7 +221,7 @@ function isInstanceStopped(instanceId) {
           resolve(true)
         }
       });
-    }, 4000);
+    }, 5000);
   }).catch(err => {
     console.error(`isInstanceStopped: ${err}`)
     return false;

@@ -35,7 +35,7 @@ $('#shutdown-btn').on('click', function (event) {
 			if (response == 'Stopped') {
 				deleteInstance(instanceId);
 			} else {
-				$('#instanceStatus').text('Shutting Down...');
+				$('#instanceStatus').text('Shutting Down, do not close the browser...');
 				setTimeout(function () {
 					deleteInstance(instanceId);
 				}, 40000);
