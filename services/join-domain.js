@@ -38,9 +38,7 @@ module.exports = {
     $act = $taskdef.Actions.Create(0)
     $act.Path = "powershell.exe"
     $act.Arguments = "-ExecutionPolicy Bypass -File C:\\Users\\MHUSER\\mydesktop\\NotifyIdleInstance.ps1"
-    $user = "MHUSER"
-    $pass = "${process.env.MHUSER_PASS}"
-    $rootFolder.RegisterTaskDefinition($TaskName, $taskdef, 6, $user, $pass, 2)
+    $rootFolder.RegisterTaskDefinition($TaskName, $taskdef, 6, 'Users', $null, 4)
     Log-Write "Scheduled task created"
   }
   Catch {

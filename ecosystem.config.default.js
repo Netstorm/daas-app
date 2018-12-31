@@ -12,7 +12,6 @@ module.exports = {
         DOMAIN: "",
         NETBIOS: "",
         OU_PATH: "",
-        MHUSER_PASS: "",
         // SSL Certificate
         CERT_PATH: "",
         CERT_PASSPHRASE: "",
