@@ -216,7 +216,7 @@ function authenticationMiddleware() {
 
 function isInstanceStopped(instanceId) {
   return new Promise((resolve, reject) => {
-    var count = 8;
+    var count = 10;
     var timer = setInterval(() => {
       if (count <= 0) {
         clearInterval(timer);
@@ -230,7 +230,7 @@ function isInstanceStopped(instanceId) {
           resolve(true)
         }
       });
-    }, 5000);
+    }, 6000);
   }).catch(err => {
     console.error(`isInstanceStopped: ${err}`)
     return false;
