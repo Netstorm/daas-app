@@ -26,7 +26,6 @@ module.exports = {
     $taskdef.Principal.RunLevel = 1
     $sets = $taskdef.Settings
     $sets.AllowDemandStart = $false
-    $sets.Compatibility = 1
     $sets.Enabled = $true
     $sets.RunOnlyIfIdle = $true
     $sets.IdleSettings.IdleDuration = "PT10M"
