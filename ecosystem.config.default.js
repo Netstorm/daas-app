@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "mydesktop",
+      name: "MyDesktop",
       script: "./bin/www",
       env: {
         NODE_ENV: "production",
@@ -41,7 +41,24 @@ module.exports = {
         PERIOD: "",
         VSWITCH_ID: "",
         SECURITY_GROUP_ID: ""
-
+      }
+    },
+    {
+      name: "IdleInstanceCrawler",
+      cwd: "./idleInstanceCrawler",
+      script: "./crawler.js",
+      env: {
+        //  Database connection
+        DB_HOST: "localhost",
+        DB_PORT: 3306,
+        DB_USER: "",
+        DB_PASS: "",
+        DB_DBNAME: "",
+        // Alibaba cloud variables
+        ALICLOUD_ACCESS_KEY_ID: "",
+        ALICLOUD_SECRET_ACCESS_KEY: "",
+        ALICLOUD_ENDPOINT: "",
+        IMAGE_ID: ""
       }
     }
   ]
