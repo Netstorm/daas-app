@@ -1,0 +1,17 @@
+{
+  "name": "idleinstancecrawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "crawler.js",
+  "scripts": {
+    "start": "node crawler.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@alicloud/pop-core": "^1.7.4",
+    "dotenv": "^6.2.0",
+    "mysql": "^2.16.0"
+  }
+}

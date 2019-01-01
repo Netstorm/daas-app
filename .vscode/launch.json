@@ -7,7 +7,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Debugger",
+      "name": "IdleInstanceCrawler",
+      "program": "${workspaceFolder}\\idleInstanceCrawler\\crawler.js",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "mhsvdi",
       "program": "${workspaceFolder}\\bin\\www",
       "envFile": "${workspaceFolder}/.env"
     }
