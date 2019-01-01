@@ -36,7 +36,7 @@ module.exports = {
     $trg.Enabled = $true
     $act = $taskdef.Actions.Create(0)
     $act.Path = "powershell.exe"
-    $act.Arguments = "-ExecutionPolicy Bypass -File C:\\Users\\MHUSER\\mydesktop\\NotifyIdleInstance.ps1"
+    $act.Arguments = "-ExecutionPolicy Bypass -File C:\\mydesktop\\NotifyIdleInstance.ps1"
     $rootFolder.RegisterTaskDefinition($TaskName, $taskdef, 6, 'Users', $null, 4)
     Log-Write "Scheduled task created"
   }
