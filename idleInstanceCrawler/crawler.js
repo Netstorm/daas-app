@@ -4,7 +4,7 @@ const rds = require('./remote-desktop-service');
 require('dotenv').config({ path: "../.env" });
 
 global.instanceslastChecked = [];
-rds.getstoppedInstances().then((instances) => {
+rds.getStoppedInstances().then((instances) => {
   instanceslastChecked = instances;
 });
 
@@ -17,7 +17,7 @@ setInterval(() => {
 
 function deleteIdleInstances() {
   return new Promise((resolve, reject) => {
-    rds.getstoppedInstances().then((instances) => {
+    rds.getStoppedInstances().then((instances) => {
       if (instances.length > 0) {
         instances.forEach(function (instanceId) {
           if (instanceslastChecked.includes(instanceId)) {
