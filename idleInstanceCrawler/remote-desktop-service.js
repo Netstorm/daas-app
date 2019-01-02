@@ -31,6 +31,7 @@ const getStoppedInstances = async () => {
         return data;
     } catch (err) {
         console.error('getStoppedInstances:', err);
+        return false;
     }
 
 }

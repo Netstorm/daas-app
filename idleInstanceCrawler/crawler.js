@@ -19,13 +19,13 @@ setInterval(() => {
 function deleteIdleInstances() {
   return new Promise((resolve, reject) => {
     rds.getStoppedInstances().then((instances) => {
-      if (instances.length > 0) {
+      if (instances && instances.length > 0) {
         instances.forEach(function (instanceId) {
           var username;
           db.getUsername(instanceId).then(result => {
             if (result && result.length > 0) {
               username = result[0].username;
-              if (instanceslastChecked.includes(instanceId)) {
+              if (instanceslastChecked.length > 0 && instanceslastChecked.includes(instanceId)) {
                 rds.deleteInstance(instanceId).then(deleted => {
                   if (deleted) {
                     instanceslastChecked = instanceslastChecked.filter(item => item !== instanceId);
