@@ -12,6 +12,7 @@
   "dependencies": {
     "@alicloud/pop-core": "^1.7.4",
     "dotenv": "^6.2.0",
+    "moment": "^2.23.0",
     "mysql": "^2.16.0"
   }
 }

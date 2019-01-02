@@ -4,14 +4,6 @@ const db = require('../services/db');
 var rds = require('../services/remote-desktop-service');
 var moment = require('moment');
 
-/* GET users listing. */
-// router.post('/', function (req, res, next) {
-//   db.saveUser(req.body.username, req.body.name).then(results => {
-//     res.json({ data: results });
-//   })
-
-// });
-
 router.get('/:username', authenticationMiddleware(), function (req, res, next) {
   db.getUser(req.params.username).then((results) => {
     if (results.length > 0) {
@@ -207,12 +199,6 @@ function authenticationMiddleware() {
     res.redirect('/');
   }
 }
-
-// router.get('/stopped/:instanceId', function (req, res) {
-//   db.getUsername(req.params.instanceId).then(result => {
-//     res.send(result);
-//   })
-// })
 
 function isInstanceStopped(instanceId) {
   return new Promise((resolve, reject) => {

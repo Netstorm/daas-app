@@ -26,11 +26,11 @@ const getStoppedInstances = async () => {
                 var instanceId = instance.InstanceId;
                 data.push(instanceId);
             });
-            console.log(`getstoppedInstances: ${JSON.stringify(data)}`)
+            console.log(`getStoppedInstances: ${JSON.stringify(data)}`)
         }
         return data;
     } catch (err) {
-        console.error('getstoppedInstances:', err);
+        console.error('getStoppedInstances:', err);
     }
 
 }
