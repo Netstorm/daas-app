@@ -28,6 +28,7 @@ module.exports = {
     $sets.AllowDemandStart = $false
     $sets.Enabled = $true
     $sets.RunOnlyIfIdle = $true
+    $sets.DisallowStartIfOnBatteries = $false
     $sets.IdleSettings.IdleDuration = "PT10M"
     $sets.IdleSettings.WaitTimeout = "PT0M"
     $sets.IdleSettings.StopOnIdleEnd = $true
