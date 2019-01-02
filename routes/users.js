@@ -209,8 +209,8 @@ function isInstanceStopped(instanceId) {
         reject(false);
       }
       rds.getInstanceStatus(instanceId).then(status => {
-        count = count - 1;
         console.log(`isInstanceStopped: count=${count}`);
+        count = count - 1;
         if (status && status == "Stopped") {
           clearInterval(timer);
           resolve(true)

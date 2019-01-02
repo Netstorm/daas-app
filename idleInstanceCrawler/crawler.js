@@ -38,7 +38,6 @@ function deleteIdleInstances() {
                 calculateUsage(lastStopTime, username).then(usageInSeconds => {
                   db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
                 });
-                console.log(`array push ${JSON.stringify(instanceslastChecked)}`);
               }
             }
           });
