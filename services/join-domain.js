@@ -38,7 +38,9 @@ module.exports = {
     $act = $taskdef.Actions.Create(0)
     $act.Path = "shutdown.exe"
     $act.Arguments = "-s"
-    $rootFolder.RegisterTaskDefinition($TaskName, $taskdef, 6, 'Users', $null, 4)
+    $user = "MHUSER"
+    $pass = "${process.env.MHUSER_PASS}"
+    $rootFolder.RegisterTaskDefinition($TaskName, $taskdef, 6, $user, $pass, 2)
     Log-Write "Scheduled task created"
   }
   Catch {
