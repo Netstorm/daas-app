@@ -54,6 +54,7 @@ $('#shutdown-btn').on('click', function (event) {
 $("#create-btn").on("click", function () {
 	event.preventDefault();
 	event.stopPropagation();
+	$('#error').hide();
 	$('#loader').show();
 	$('#create-btn').attr("disabled", true);
 	$('#delete-btn').attr("disabled", true);
