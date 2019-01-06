@@ -80,17 +80,13 @@ router.post('/createInstance', function (req, res, next) {
 
 /** Bind Elastic IP */
 router.put('/bindip', function (req, res) {
-	rds.getAvailableEipAddresses().then(ipaddresses => {
-		var ip = ipaddresses[0].IpAddress;
-		var allocationId = ipaddresses[0].AllocationId;
-		rds.bindIpAddress(req.body.instanceId, allocationId).then(() => {
-			db.updateIp(ip, allocationId, req.body.username).then(() => {
-				res.json({ instanceIp: ip, binded: true });
-			});
-		}).catch(err => {
-			console.error(err);
-			res.json({ binded: false });
+	rds.bindIpAddress(req.body.instanceId).then((data) => {
+		db.updateIp(data.instanceIP, data.ipAllocationId, req.body.username).then(() => {
+			res.json({ instanceIp: data.instanceIP, binded: true });
 		});
+	}).catch(err => {
+		console.error(err);
+		res.json({ binded: false });
 	});
 });
 

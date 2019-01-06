@@ -1,5 +1,4 @@
 var mysql = require('mysql');
-var moment = require('moment');
 
 var connection = mysql.createConnection({
 	host: process.env.DB_HOST,

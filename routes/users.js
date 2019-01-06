@@ -115,33 +115,29 @@ router.get('/:username/getInstanceStatus', function (req, res, next) {
 router.post('/:username/createInstance', authenticationMiddleware(), function (req, res, next) {
   var username = req.params.username;
   var instanceId = null;
-  var instanceIP = null;
-  var ipAllocationId = null;
   rds.getAvailableEipAddresses().then(result => {
-    if (result) {
-      instanceIP = result[0].IpAddress;
-      ipAllocationId = result[0].AllocationId;
+    if (result && result.length > 0) {
       rds.createInstance(username).then(result => {
-        if (result) {
+        if (result && !result.error) {
           instanceId = result.InstanceId;
           isInstanceStopped(instanceId).then(stopped => {
             if (stopped) {
-              rds.bindIpAddress(instanceId, ipAllocationId).then((result) => {
-                if (result) {
-                  db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
-                  res.status(200).send('Stopped');
+              rds.bindIpAddress(instanceId).then((data) => {
+                if (data) {
+                  db.saveInstanceDetails(instanceId, data.instanceIP, data.ipAllocationId, 'Stopped', null, username);
+                  res.status(200).send('Created');
                 } else {
                   db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
-                  res.status(500).send('Failed to assign IP');
+                  res.status(500).send('Failed to assign IP, delete & launch new PC');
                 }
               })
             } else {
               db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
-              res.status(500).send('Failed to assign IP');
+              res.status(500).send('Failed to assign IP, delete & launch new PC');
             }
           })
         } else {
-          res.status(500).send('Could not create instance');
+          res.status(500).send(result.error);
         }
       })
     } else {

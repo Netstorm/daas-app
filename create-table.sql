@@ -7,5 +7,5 @@ CREATE TABLE process.env.DB_DBNAME.`users` (
   `ipAllocationId` VARCHAR(40) NULL DEFAULT NULL ,
   `lastStartTime` VARCHAR(50) NULL DEFAULT NULL ,
   `lastStopTime` VARCHAR(50) NULL DEFAULT NULL ,
-  `usageInSeconds` BIGINT(20) NULL DEFAULT 0
+  `usageInSeconds` BIGINT(20) NULL DEFAULT 0 ,
   PRIMARY KEY (`username`(40))) ENGINE = InnoDB;

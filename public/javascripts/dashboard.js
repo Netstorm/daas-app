@@ -51,7 +51,7 @@ $('#shutdown-btn').on('click', function (event) {
 });
 
 /** Start or Create Instance */
-$("#create-btn").on("click", function () {
+$("#create-btn").on("click", function (event) {
 	event.preventDefault();
 	event.stopPropagation();
 	$('#error').hide();
@@ -136,7 +136,7 @@ function createInstance(username) {
 		url: `/users/${username}/createInstance`,
 		method: 'POST',
 		success: function (response) {
-			if (response == "Stopped") {
+			if (response == "Created") {
 				$('#instanceStatus').text('Created');
 				startInstance(username);
 			} else {

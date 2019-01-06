@@ -1,6 +1,7 @@
 var RPCClient = require('@alicloud/pop-core').RPCClient;
 var _ = require('lodash');
 var joinDomain = require('./join-domain');
+const Lock = require('./async-lock');
 
 // Account config and request options
 var client = new RPCClient({
@@ -88,7 +89,7 @@ function createInstance(username) {
 				reject();
 			}
 		}).catch(err => {
-			console.error('createInstance: ', err);
+			console.error(`createInstance: ${err}`);
 			resolve(false);
 		});
 	});
@@ -144,31 +145,46 @@ function getAvailableEipAddresses() {
 			}
 		}).catch(err => {
 			console.error(`describeEipAddresses: ${err}`);
-			return false;
+			resolve(false);
 		});
 	});
 }
 
-function bindIpAddress(instanceId, allocationId) {
-	var params = {
-		RegionId: process.env.REGION_ID,
-		AllocationId: allocationId,
-		InstanceId: instanceId
-	}
+const lock = new Lock();
+function bindIpAddress(instanceId) {
 	return new Promise((resolve, reject) => {
-		client.request('AssociateEipAddress', params).then(result => {
-			if (result && result.RequestId) {
-				console.log(`bindIpAddress: IP Binded`);
-				resolve(result);
-			} else {
-				reject('Failed to bind IP');
-			}
-		}).catch(err => {
-			console.error(`bindIpAddress: ${err}`);
+		lock.acquire().then(() => {
+			getAvailableEipAddresses().then(ips => {
+				if (ips && ips.length > 0) {
+					var allocationId = ips[0].AllocationId;
+					var ipAddress = ips[0].IpAddress;
+					console.log(`bindIpAddress: ${ipAddress}`);
+					var params = {
+						RegionId: process.env.REGION_ID,
+						AllocationId: allocationId,
+						InstanceId: instanceId
+					}
+					client.request('AssociateEipAddress', params).then(result => {
+						if (result && result.RequestId) {
+							console.log(`bindIpAddress: IP Binded`);
+							var data = { instanceIP: ipAddress, ipAllocationId: allocationId }
+							lock.release();
+							resolve(data);
+						}
+					}).catch(err => {
+						console.error(`bindIpAddress: ${err}`);
+						lock.release();
+						resolve(false);
+					});
+				} else {
+					lock.release();
+					resolve(false);
+				}
+			}).catch(err => {
+				console.error(`${err}`);
+				resolve(false);
+			})
 		});
-	}).catch(err => {
-		console.error(`bindIpAddress: ${err}`);
-		return false;
 	});
 }
 
