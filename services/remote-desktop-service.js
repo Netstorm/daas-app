@@ -156,13 +156,11 @@ const bindIpAddress = async (instanceId, allocationId) => {
 			AllocationId: allocationId,
 			InstanceId: instanceId
 		}
-		setTimeout(() => {
-			var result = await client.request('AssociateEipAddress', params);
-			if (result && result.RequestId) {
-				console.log(`bindIpAddress: IP Binded`);
-				return result;
-			}
-		}, 4000);
+		var result = await client.request('AssociateEipAddress', params);
+		if (result && result.RequestId) {
+			console.log(`bindIpAddress: IP Binded`);
+			return result;
+		}
 	} catch (err) {
 		console.error(`bindIpAddress: ${err}`);
 		return false;

@@ -126,15 +126,17 @@ router.post('/:username/createInstance', authenticationMiddleware(), function (r
           instanceId = result.InstanceId;
           isInstanceStopped(instanceId).then(stopped => {
             if (stopped) {
-              rds.bindIpAddress(instanceId, ipAllocationId).then((result) => {
-                if (result) {
-                  db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
-                  res.status(200).send('Stopped');
-                } else {
-                  db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
-                  res.status(500).send('Failed to assign IP');
-                }
-              })
+              setTimeout(() => {
+                rds.bindIpAddress(instanceId, ipAllocationId).then((result) => {
+                  if (result) {
+                    db.saveInstanceDetails(instanceId, instanceIP, ipAllocationId, 'Stopped', null, username);
+                    res.status(200).send('Stopped');
+                  } else {
+                    db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
+                    res.status(500).send('Failed to assign IP');
+                  }
+                })
+              }, 5000);
             } else {
               db.saveInstanceDetails(instanceId, null, null, 'IP unassigned, delete & launch new PC', null, username);
               res.status(500).send('Failed to assign IP');
