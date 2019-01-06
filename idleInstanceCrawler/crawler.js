@@ -21,26 +21,30 @@ function deleteIdleInstances() {
     rds.getStoppedInstances().then((instances) => {
       if (instances && instances.length > 0) {
         instances.forEach(function (instanceId) {
-          var username;
+          var username = null;
           db.getUsername(instanceId).then(result => {
             if (result && result.length > 0) {
               username = result[0].username;
-              if (instanceslastChecked.length > 0 && instanceslastChecked.includes(instanceId)) {
-                rds.deleteInstance(instanceId).then(deleted => {
-                  if (deleted) {
-                    instanceslastChecked = instanceslastChecked.filter(item => item !== instanceId);
-                    db.updateOnDeleteInstance(null, null, null, null, username);
-                  }
-                });
-              } else {
-                instanceslastChecked.push(instanceId);
-                var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-                calculateUsage(lastStopTime, username).then(usageInSeconds => {
-                  db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
-                });
-              }
             }
           });
+          if (instanceslastChecked.length > 0 && instanceslastChecked.includes(instanceId)) {
+            rds.deleteInstance(instanceId).then(deleted => {
+              if (deleted) {
+                instanceslastChecked = instanceslastChecked.filter(item => item !== instanceId);
+                if (username != null) {
+                  db.updateOnDeleteInstance(null, null, null, null, username);
+                }
+              }
+            });
+          } else {
+            instanceslastChecked.push(instanceId);
+            var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+            if (username != null) {
+              calculateUsage(lastStopTime, username).then(usageInSeconds => {
+                db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
+              });
+            }
+          }
         });
         resolve();
       } else {
