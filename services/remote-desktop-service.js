@@ -144,27 +144,32 @@ function getAvailableEipAddresses() {
 			}
 		}).catch(err => {
 			console.error(`describeEipAddresses: ${err}`);
-			resolve(false);
+			return false;
 		});
 	});
 }
 
-const bindIpAddress = async (instanceId, allocationId) => {
-	try {
-		var params = {
-			RegionId: process.env.REGION_ID,
-			AllocationId: allocationId,
-			InstanceId: instanceId
-		}
-		var result = await client.request('AssociateEipAddress', params);
-		if (result && result.RequestId) {
-			console.log(`bindIpAddress: IP Binded`);
-			return result;
-		}
-	} catch (err) {
+function bindIpAddress(instanceId, allocationId) {
+	var params = {
+		RegionId: process.env.REGION_ID,
+		AllocationId: allocationId,
+		InstanceId: instanceId
+	}
+	return new Promise((resolve, reject) => {
+		client.request('AssociateEipAddress', params).then(result => {
+			if (result && result.RequestId) {
+				console.log(`bindIpAddress: IP Binded`);
+				resolve(result);
+			} else {
+				reject('Failed to bind IP');
+			}
+		}).catch(err => {
+			console.error(`bindIpAddress: ${err}`);
+		});
+	}).catch(err => {
 		console.error(`bindIpAddress: ${err}`);
 		return false;
-	}
+	});
 }
 
 const unbindIpAddress = async (instanceId, allocationId) => {
