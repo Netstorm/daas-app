@@ -63,10 +63,23 @@ $(document).ready(function () {
 $("button").on("click", function () {
   event.preventDefault();
   event.stopPropagation();
+  var self = $(this);
+  $.blockUI({
+    css: {
+      border: 'none',
+      padding: '15px',
+      backgroundColor: '#000',
+      '-webkit-border-radius': '10px',
+      '-moz-border-radius': '10px',
+      opacity: .5,
+      color: '#fff'
+    }
+  });
   var instanceId = $(this).closest("tr").find(".instanceId").text();
   var username = $(this).closest("tr").find(".username").text();
   console.log(username);
   console.log(instanceId);
+  $(this).disabled = true;
   $('#loader').show();
   if ($(this).hasClass('release-btn')) {
     deleteInstance(username, instanceId);
@@ -82,13 +95,19 @@ $("button").on("click", function () {
         username: username
       },
       success: function (response) {
-        console.log(response);
-        $(this).closest("tr").find(".instanceId").text(response.instanceId);
-        $('#loader').hide();
-        location.reload();
+        setTimeout(() => {
+          $('#loader').hide();
+          if (response.created) {
+            self.closest("tr").children("td.instanceId").text(response.instanceId);
+          }
+          $.unblockUI();
+          location.reload();
+        }, 20000);
+
       },
       error: function (err) {
         console.log('ERROR: ', err);
+        $.unblockUI();
         $('#loader').hide();
       }
     });
@@ -104,10 +123,12 @@ $("button").on("click", function () {
       success: function (response) {
         console.log(response);
         $('#loader').hide();
+        $.unblockUI();
         location.reload();
       },
       error: function (err) {
         console.log('ERROR: ', err);
+        $.unblockUI();
         $('#loader').hide();
       }
     });
@@ -123,10 +144,12 @@ $("button").on("click", function () {
       success: function (response) {
         console.log(response);
         $('#loader').hide();
+        $.unblockUI();
         location.reload();
       },
       error: function (err) {
         console.log('ERROR: ', err);
+        $.unblockUI();
         $('#loader').hide();
       }
     });
@@ -146,6 +169,7 @@ function deleteInstance(username, instanceId) {
     success: function (response) {
       setTimeout(function () {
         $('#loader').hide();
+        $.unblockUI();
         location.reload();
       }, 10000);
     },
@@ -153,6 +177,7 @@ function deleteInstance(username, instanceId) {
       $('#loader').hide();
       $('#error').text('Failed to delete, please try again');
       $('#error').show();
+      $.unblockUI();
     }
   });
 };
@@ -164,6 +189,7 @@ function stopInstance(username, instanceId) {
       console.log(response);
       setTimeout(() => {
         $('#loader').hide();
+        $.unblockUI();
         location.reload();
       }, 40000);
     },
@@ -172,6 +198,7 @@ function stopInstance(username, instanceId) {
       $('#loader').hide();
       $('#error').text('Failed to stop instance, please try again');
       $('#error').show();
+      $.unblockUI();
     }
   });
 }
