@@ -77,8 +77,6 @@ $("button").on("click", function () {
   });
   var instanceId = $(this).closest("tr").find(".instanceId").text();
   var username = $(this).closest("tr").find(".username").text();
-  console.log(username);
-  console.log(instanceId);
   $(this).disabled = true;
   $('#loader').show();
   if ($(this).hasClass('release-btn')) {
@@ -106,7 +104,8 @@ $("button").on("click", function () {
 
       },
       error: function (err) {
-        console.log('ERROR: ', err);
+        $('#error').text(err.responseText);
+        $('#error').show();
         $.unblockUI();
         $('#loader').hide();
       }
@@ -121,13 +120,13 @@ $("button").on("click", function () {
         instanceId: instanceId
       },
       success: function (response) {
-        console.log(response);
         $('#loader').hide();
         $.unblockUI();
         location.reload();
       },
       error: function (err) {
-        console.log('ERROR: ', err);
+        $('#error').text(err.responseText);
+        $('#error').show();
         $.unblockUI();
         $('#loader').hide();
       }
@@ -142,13 +141,13 @@ $("button").on("click", function () {
         instanceId: instanceId
       },
       success: function (response) {
-        console.log(response);
         $('#loader').hide();
         $.unblockUI();
         location.reload();
       },
       error: function (err) {
-        console.log('ERROR: ', err);
+        $('#error').text(err.responseText);
+        $('#error').show();
         $.unblockUI();
         $('#loader').hide();
       }
@@ -186,7 +185,6 @@ function stopInstance(username, instanceId) {
   $.ajax({
     url: `/users/${username}/${instanceId}/stopInstance`,
     success: function (response) {
-      console.log(response);
       setTimeout(() => {
         $('#loader').hide();
         $.unblockUI();
@@ -194,7 +192,6 @@ function stopInstance(username, instanceId) {
       }, 40000);
     },
     error: function (err) {
-      console.log('ERROR: ', err);
       $('#loader').hide();
       $('#error').text('Failed to stop instance, please try again');
       $('#error').show();

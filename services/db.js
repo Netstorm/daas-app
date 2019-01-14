@@ -264,8 +264,109 @@ function saveInstanceDetailsAndUsage(instanceId, instanceIP, allocationId, insta
 	})
 }
 
+function saveUsageRecord(username, startTime, weekNumber, month) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'INSERT INTO `instanceusage` (username, startTime, weekNumber, month) VALUES (?,?,?,?)',
+			values: [username, startTime, weekNumber, month]
+		}, function (error, results, fields) {
+			if (error) {
+				console.error(`saveUsageRecord: ${JSON.stringify(error)}`);
+				resolve(false);
+			} else {
+				resolve(results);
+			}
+		})
+	})
+}
+
+function getStartTimeFromUsageRecord(username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'SELECT `startTime` FROM `instanceusage` WHERE `username`=(?) ORDER BY `startTime` DESC LIMIT 1',
+			values: [username]
+		},
+			function (error, results, fields) {
+				if (error) {
+					console.error(`getStartTimeFromUsageRecord: ${JSON.stringify(error)}`);
+					resolve(false);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
+function updateUsageRecord(stopTime, usageInSeconds, username, startTime) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'UPDATE `instanceusage` SET `stopTime` = (?), `usageInSeconds` = (?) WHERE `username` = (?) AND `startTime` = (?)',
+			values: [stopTime, usageInSeconds, username, startTime]
+		}, function (error, results, fields) {
+			if (error) {
+				console.error(`updateUsageRecord: ${JSON.stringify(error)}`)
+				resolve(false);
+			} else {
+				resolve(results);
+			}
+		});
+	});
+}
+
+function getUsageForWeek(weekNumber) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'SELECT `username`, SUM(CASE WHEN `weekNumber` = (?) THEN `usageInSeconds` ELSE 0 END) AS `usageInSeconds` FROM `instanceusage` GROUP BY `username`',
+			values: [weekNumber]
+		},
+			function (error, results, fields) {
+				if (error) {
+					console.error(`getUsageForWeek: ${JSON.stringify(error)}`);
+					resolve(false);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
+function getUsageForMonth(month) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'SELECT `username`, SUM(CASE WHEN `month` = (?) THEN `usageInSeconds` ELSE 0 END) AS `usageInSeconds` FROM `instanceusage` GROUP BY `username`',
+			values: [month]
+		},
+			function (error, results, fields) {
+				if (error) {
+					console.error(`getUsageForMonth: ${JSON.stringify(error)}`);
+					resolve(false);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
+function getLastStopTime(username) {
+	return new Promise((resolve, reject) => {
+		connection.query({
+			sql: 'SELECT `lastStopTime` FROM `users` WHERE `username` = ?',
+			values: [username]
+		},
+			function (error, results, fields) {
+				if (error) {
+					console.error(`getLastStopTimes: ${JSON.stringify(error)}`);
+					resolve(false);
+				} else {
+					resolve(results);
+				}
+			});
+	});
+}
+
 module.exports = {
 	connection, getUser, getAllUsers, updateUser, saveUser, ifUserExists, updateInstanceStatus,
 	updateStatusAndUsage, saveInstanceIdandStatus, updateIp, getIpDetails, saveInstanceDetails, updateOnDeleteInstance,
-	updateStatusAndStartTime, getLastStartTimeAndUsage, saveInstanceDetailsAndUsage, getInstanceId, getUsername
+	updateStatusAndStartTime, getLastStartTimeAndUsage, saveInstanceDetailsAndUsage, getInstanceId, getUsername,
+	saveUsageRecord, getStartTimeFromUsageRecord, updateUsageRecord, getUsageForWeek, getUsageForMonth, getLastStopTime
 };

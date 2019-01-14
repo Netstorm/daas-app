@@ -37,8 +37,12 @@ router.put('/:username/startInstance', authenticationMiddleware(), function (req
     if (data && data[0].instanceId) {
       rds.startInstance(data[0].instanceId).then(result => {
         if (result && result.RequestId) {
-          var lastStartTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
+          var startTime = moment().local();
+          var weekNumber = startTime.isoWeek();
+          var month = startTime.month() + 1;
+          var lastStartTime = startTime.format("DD-MM-YYYY HH:mm:ss").toString();
           db.updateStatusAndStartTime('Running', lastStartTime, req.params.username);
+          db.saveUsageRecord(req.params.username, lastStartTime, weekNumber, month);
           res.status(200).send('Running');
         } else {
           res.status(500).send('Start request failed, please try again!');
@@ -58,9 +62,12 @@ router.get('/:username/:instanceId/stopInstance', function (req, res, next) {
       rds.stopInstance(req.params.instanceId).then(result => {
         if (result && result.RequestId) {
           var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
-          calculateUsage(lastStopTime, req.params.username).then(usageInSeconds => {
-            db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, req.params.username);
-          })
+          calculateUsage(lastStopTime, req.params.username).then(usage => {
+            db.updateStatusAndUsage('Stopped', lastStopTime, usage.cumulativeUsage, req.params.username);
+            db.getStartTimeFromUsageRecord(req.params.username).then(result => {
+              db.updateUsageRecord(lastStopTime, usage.runningTime, req.params.username, result[0].startTime);
+            });
+          });
           res.status(200).send();
         } else {
           res.status(500).send();
@@ -81,6 +88,9 @@ router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
           var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
           calculateUsage(lastStopTime, username).then(usageInSeconds => {
             db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
+            db.getStartTimeFromUsageRecord(req.params.username).then(startTime => {
+              db.updateUsageRecord(lastStopTime, usageInSeconds, req.params.username, startTime);
+            });
             isInstanceStopped(req.params.instanceId).then(stopped => {
               if (stopped) {
                 rds.deleteInstance(req.params.instanceId).then(result => {
@@ -165,18 +175,30 @@ router.post('/:username/deleteInstance', function (req, res, next) {
   })
 })
 
+router.get('/:username/saveStart', function (req, res, next) {
+  var startTime = moment().local();
+  var weekNumber = startTime.isoWeek();
+  var month = startTime.month() + 1;
+  var lastStartTime = startTime.format("DD-MM-YYYY HH:mm:ss").toString();
+  res.json({
+    'startTime': startTime,
+    'weekNumber': weekNumber,
+    'month': month,
+    'lastStartTime': lastStartTime
+  });
+});
 
 function calculateUsage(stopTime, username) {
-  var usage;
+  var usage = { cumulativeUsage: 0, runningTime: 0 };
   return new Promise((resolve, reject) => {
     db.getLastStartTimeAndUsage(username).then((result) => {
-      usage = result[0].usageInSeconds;
+      usage.cumulativeUsage = result[0].usageInSeconds;
       if (result && result[0].lastStartTime) {
         var lastStartTime = moment(result[0].lastStartTime, "DD-MM-YYYY HH:mm:ss")
         var lastStopTime = moment(stopTime, "DD-MM-YYYY HH:mm:ss")
         var diffInMs = lastStopTime.diff(lastStartTime);
-        var runningTime = moment.duration(diffInMs).asSeconds();
-        usage = usage + runningTime;
+        usage.runningTime = moment.duration(diffInMs).asSeconds();
+        usage.cumulativeUsage = usage.cumulativeUsage + usage.runningTime;
         resolve(usage)
       } else {
         resolve(usage)

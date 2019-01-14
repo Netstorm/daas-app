@@ -32,7 +32,6 @@ router.post('/login',
 						if (result) {
 							user.username = req.body.username;
 							ad.user(user.username).get().then(adUser => {
-								console.log('Name: ', adUser.displayName);
 								user.name = adUser.displayName;
 								req.login(user.username, function (err) {
 									res.redirect('/admin/dashboard');

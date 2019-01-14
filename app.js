@@ -15,6 +15,7 @@ var passport = require('passport');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
+var reportRouter = require('./routes/report');
 // Load env variables
 require('dotenv').config();
 
@@ -59,15 +60,26 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 app.use(function (req, res, next) {
   res.locals.isAuthenticated = req.isAuthenticated();
   next();
 });
+
+// app.use('*', function (req, res, next) {
+//   if (!req.secure && process.env.NODE_ENV == 'production') {
+//     var secureUrl = "https://mydesktopmhs.amidata.com.au:3001" + req.url;
+//     res.writeHead(301, { "Location": secureUrl });
+//     res.end();
+//   }
+//   next();
+// });
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
+app.use('/report', reportRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -85,15 +97,6 @@ app.use(function (err, req, res, next) {
   res.render('error');
 
 });
-
-// app.use('*', function (req, res, next) {
-//   if (!req.secure && process.env.NODE_ENV == 'production') {
-//     var secureUrl = "https://mydesktopmhs.amidata.com.au:3001" + req.url;
-//     res.writeHead(301, { "Location": secureUrl });
-//     res.end();
-//   }
-//   next();
-// });
 
 https.createServer(httpsOptions, app).listen(443);
 

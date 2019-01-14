@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<% include partials/head %>
+</head>
+
+<body>
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><span><img src="/images/logo.png" height="40px" /></span> Melbourne High School</a>
+			</div>
+		</div>
+	</nav>
+</br>
+	<div class="container">
+			<div class="col-sm-6">
+				<div class="alert alert-danger" id="error"></div>
+				<div class="text-center"><img src="/images/loader.gif" id="loader" style="display:none" /></div>
+			</div>
+			<div class="col-sm-6">
+				<div></br></div>
+			</div>
+		<table class="table text-center">
+			<tr>
+				<th class="text-center">Username</th>
+				<th class="text-center">This Week</th>
+				<th class="text-center">This Month</th>
+				<th class="text-center">
+					<form class="form-inline">
+						<div class="form-group">
+							<label>Usage &nbsp;&nbsp;</label>
+							<select class="form-control filter">
+								<option value="last-week">Last Week</option>
+								<option value="1">January</option>
+								<option value="2">February</option>
+								<option value="3">March</option>
+								<option value="4">April</option>
+								<option value="5">May</option>
+								<option value="6">June</option>
+								<option value="7">July</option>
+								<option value="8">August</option>
+								<option value="9">September</option>
+								<option value="10">October</option>
+								<option value="11">November</option>
+								<option value="12">December</option>
+							</select>
+						</div>
+					</form>
+				</th>
+				<th class="text-center">Last Used</th>
+			</tr>
+      <tr>
+			<% for (var i = 0; i < vdiusers.length; i++) { %>
+				<td class="username" id="<%= vdiusers[i].username %>"><%= vdiusers[i].username %></td>
+				<td class="this-week" id="<%= vdiusers[i].username %>" data-usage="<%= vdiusers[i].usageThisWeek %>"></td>
+				<td class="this-month" id="<%= vdiusers[i].username %>" data-usage="<%= vdiusers[i].usageThisMonth %>"></td>
+				<td class="usage" id="<%= vdiusers[i].username %>" data-usage="<%= vdiusers[i].usageInSeconds %>"></td>
+				<td class="last-used" id="<%= vdiusers[i].username %>"><%= vdiusers[i].lastStopTime %></td>
+			</tr>
+			<% } %>
+		</table>
+	</div>
+</body>
+<script type="text/javascript" src="/javascripts/navbar.js"></script>
+<script type="text/javascript" src="/javascripts/report.js"></script>
+<script type="text/javascript" src="/javascripts/moment.min.js"></script>
+
+</html>

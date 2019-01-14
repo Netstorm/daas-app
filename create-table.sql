@@ -9,3 +9,14 @@ CREATE TABLE process.env.DB_DBNAME.`users` (
   `lastStopTime` VARCHAR(50) NULL DEFAULT NULL ,
   `usageInSeconds` BIGINT(20) NULL DEFAULT 0 ,
   PRIMARY KEY (`username`(40))) ENGINE = InnoDB;
+
+CREATE TABLE `mhsvdi`.`instanceUsage` (
+  `username` VARCHAR(30) NOT NULL ,
+  `startTime` VARCHAR(30) NOT NULL ,
+  `stopTime` VARCHAR(30) NULL DEFAULT NULL ,
+  `usageInSeconds` INT NOT NULL  DEFAULT 0 ,
+  `weekNumber` INT NOT NULL ,
+  `month` INT NOT NULL ,
+  INDEX `week` (`username`, `weekNumber`) ,
+  INDEX `month` (`username`, `month`)
+  ) ENGINE = InnoDB;
