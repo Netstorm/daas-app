@@ -90,7 +90,7 @@ function createInstance(username) {
 			}
 		}).catch(err => {
 			console.error(`createInstance: ${err}`);
-			resolve(false);
+			resolve({ error: err.data.Message });
 		});
 	});
 }
