@@ -88,8 +88,8 @@ router.patch('/:instanceId/stopIdleInstance', function (req, res, next) {
           var lastStopTime = moment().format("DD-MM-YYYY HH:mm:ss").toString();
           calculateUsage(lastStopTime, username).then(usageInSeconds => {
             db.updateStatusAndUsage('Stopped', lastStopTime, usageInSeconds, username);
-            db.getStartTimeFromUsageRecord(req.params.username).then(startTime => {
-              db.updateUsageRecord(lastStopTime, usageInSeconds, req.params.username, startTime);
+            db.getStartTimeFromUsageRecord(username).then(startTime => {
+              db.updateUsageRecord(lastStopTime, usageInSeconds, username, startTime);
             });
             isInstanceStopped(req.params.instanceId).then(stopped => {
               if (stopped) {
@@ -175,19 +175,7 @@ router.post('/:username/deleteInstance', function (req, res, next) {
   })
 })
 
-router.get('/:username/saveStart', function (req, res, next) {
-  var startTime = moment().local();
-  var weekNumber = startTime.isoWeek();
-  var month = startTime.month() + 1;
-  var lastStartTime = startTime.format("DD-MM-YYYY HH:mm:ss").toString();
-  res.json({
-    'startTime': startTime,
-    'weekNumber': weekNumber,
-    'month': month,
-    'lastStartTime': lastStartTime
-  });
-});
-
+/** Calculates running time of an instance */
 function calculateUsage(stopTime, username) {
   var usage = { cumulativeUsage: 0, runningTime: 0 };
   return new Promise((resolve, reject) => {
@@ -218,6 +206,9 @@ function authenticationMiddleware() {
   }
 }
 
+/** Checks if the instance is in stopped state
+ * by pinging the status every 6 seconds, 10 times
+ */
 function isInstanceStopped(instanceId) {
   return new Promise((resolve, reject) => {
     var count = 10;
